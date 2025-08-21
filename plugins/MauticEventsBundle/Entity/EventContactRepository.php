@@ -50,4 +50,19 @@ class EventContactRepository extends CommonRepository
 
         return array_map('intval', array_column($results, 'id'));
     }
+
+    public function contactHasEventByName(int $contactId, string $eventName): bool
+    {
+        $result = $this->createQueryBuilder('ec')
+            ->select('COUNT(ec.id)')
+            ->join('ec.event', 'e')
+            ->where('ec.contact = :contactId')
+            ->andWhere('LOWER(e.name) = LOWER(:eventName)')
+            ->setParameter('contactId', $contactId)
+            ->setParameter('eventName', $eventName)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) $result > 0;
+    }
 }

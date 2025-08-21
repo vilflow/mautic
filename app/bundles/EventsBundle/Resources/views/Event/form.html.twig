@@ -1,0 +1,46 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}event{% endblock %}
+
+{% block headerTitle %}
+    {% if entity.id %}
+        {{ 'mautic.events.menu.edit'|trans({'%name%': entity.name}) }}
+    {% else %}
+        {{ 'mautic.events.menu.new'|trans }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-12 height-auto">
+            <div class="pa-md">
+                {{ form_row(form.name) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    {% if entity.id %}
+        <div id="event-contacts"
+             data-event-id="{{ entity.id }}"
+             data-contacts-url="{{ path('mautic_event_contacts', {'objectId': entity.id}) }}"
+             data-search-url="{{ path('mautic_event_contacts_search', {'objectId': entity.id}) }}"
+             data-attach-url="{{ path('mautic_event_contacts_attach', {'objectId': entity.id}) }}"
+             data-detach-url-template="{{ path('mautic_event_contacts_detach', {'objectId': entity.id, 'contactId': 'CONTACT_ID'}) }}"
+             data-remove-label="{{ 'events.contact.remove'|trans }}"
+             data-search-placeholder="{{ 'events.contact.search_placeholder'|trans }}">
+            <h3>{% trans %}events.contact.panel{% endtrans %}</h3>
+            <div class="form-group">
+                <select id="contact-search" class="form-control" multiple aria-label="{% trans %}events.contact.search_placeholder{% endtrans %}"></select>
+                <button id="attach-contacts" class="btn btn-primary mt-2" disabled>{% trans %}events.contact.attach{% endtrans %}</button>
+            </div>
+            <div id="attached-contacts" class="mt-4">
+                <h4>{% trans %}events.contact.attached{% endtrans %}</h4>
+                <ul id="attached-contact-list" class="list-group"></ul>
+                <div id="attached-empty" class="text-muted">{% trans %}events.contact.none{% endtrans %}</div>
+            </div>
+        </div>
+        {{ includeScript('plugins/MauticEventsBundle/Assets/js/events.js') }}
+    {% endif %}
+{% endblock %}

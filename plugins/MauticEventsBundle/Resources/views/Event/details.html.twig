@@ -1,0 +1,70 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}event{% endblock %}
+{% block headerTitle %} {{ event.getName() }} {% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        item: event,
+        templateButtons: {
+            edit: is_granted('events:events:edit'),
+            delete: is_granted('events:events:delete')
+        },
+        routeBase: 'event'
+    }) }}
+{% endblock %}
+
+{% block content %}
+    <div class="box-layout">
+        <div class="col-md-12 height-auto">
+            <table class="table table-hover">
+                <tr>
+                    <td>{% trans %}mautic.core.id{% endtrans %}</td>
+                    <td>{{ event.getId() }}</td>
+                </tr>
+                <tr>
+                    <td>{% trans %}mautic.core.name{% endtrans %}</td>
+                    <td>{{ event.getName() }}</td>
+                </tr>
+            </table>
+            <!-- contacts section -->
+            <div class="pa-md enage">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- Add Contacts Form -->
+                        <div class="panel mb-3">
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <label for="contact-search">{% trans %}events.contact.search_placeholder{% endtrans %}</label>
+                                    <select id="contact-search" class="form-control" multiple 
+                                            aria-label="{% trans %}events.contact.search_placeholder{% endtrans %}"
+                                            data-event-id="{{ event.getId() }}"
+                                            data-search-url="{{ path('mautic_event_contacts_search', {'objectId': event.getId()}) }}"
+                                            data-search-placeholder="{{ 'events.contact.search_placeholder'|trans }}">
+                                    </select>
+                                </div>
+                                <button id="attach-contacts" class="btn btn-primary" disabled
+                                        data-attach-url="{{ path('mautic_event_contacts_attach', {'objectId': event.getId()}) }}">
+                                    {% trans %}events.contact.attach{% endtrans %}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Contacts Table -->
+                        <div id="event-contacts-table" 
+                             data-event-id="{{ event.getId() }}"
+                             data-contacts-url="{{ path('mautic_event_contacts', {'objectId': event.getId()}) }}"
+                             data-detach-url-template="{{ path('mautic_event_contacts_detach', {'objectId': event.getId(), 'contactId': 'CONTACT_ID'}) }}"
+                             data-remove-label="{{ 'events.contact.remove'|trans }}">
+                            <!-- Contacts table will be loaded here via AJAX -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ contacts section -->
+        </div>
+        <input name="entityId" id="entityId" type="hidden" value="{{ event.getId()|escape }}" />
+    </div>
+
+    {{ includeScript('plugins/MauticEventsBundle/Assets/js/events.js') }}
+{% endblock %}

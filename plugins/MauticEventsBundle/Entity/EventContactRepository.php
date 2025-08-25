@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEventsBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -53,16 +54,15 @@ class EventContactRepository extends CommonRepository
 
     public function contactHasEventByName(int $contactId, string $eventName): bool
     {
-        $result = $this->createQueryBuilder('ec')
-            ->select('COUNT(ec.id)')
-            ->join('ec.event', 'e')
-            ->where('ec.contact = :contactId')
-            ->andWhere('LOWER(e.name) = LOWER(:eventName)')
-            ->setParameter('contactId', $contactId)
-            ->setParameter('eventName', $eventName)
-            ->getQuery()
-            ->getSingleScalarResult();
+        $qb = $this->createQueryBuilder('ec')
+            ->select('1')
+            ->innerJoin('ec.event', 'e')
+            ->andWhere('IDENTITY(ec.contact) = :contactId')
+            ->andWhere('e.name = :eventName')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setParameter('eventName', trim($eventName), ParameterType::STRING)
+            ->setMaxResults(1);
 
-        return (int) $result > 0;
+        return $qb->getQuery()->getOneOrNullResult() !== null;
     }
 }

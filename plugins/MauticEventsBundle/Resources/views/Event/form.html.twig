@@ -4,7 +4,7 @@
 
 {% block headerTitle %}
     {% if entity.id %}
-        {{ 'mautic.events.menu.edit'|trans({'%name%': entity.name}) }}
+        {{ 'mautic.events.menu.edit'|trans({'%name%': entity.conferenceName}) }}
     {% else %}
         {{ 'mautic.events.menu.new'|trans }}
     {% endif %}
@@ -15,7 +15,13 @@
     <div class="box-layout">
         <div class="col-md-12 height-auto">
             <div class="pa-md">
-                {{ form_row(form.name) }}
+                {{ form_row(form.conferenceName) }}
+                {{ form_row(form.website) }}
+                {{ form_row(form.currency) }}
+                {{ form_row(form.country) }}
+                {{ form_row(form.city) }}
+                {{ form_row(form.registrationUrl) }}
+                {{ form_row(form.suitecrmId) }}
             </div>
         </div>
     </div>

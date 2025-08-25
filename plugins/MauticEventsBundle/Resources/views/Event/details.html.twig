@@ -1,7 +1,7 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}event{% endblock %}
-{% block headerTitle %} {{ event.getName() }} {% endblock %}
+{% block headerTitle %} {{ event.getConferenceName() }} {% endblock %}
 
 {% block actions %}
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
@@ -23,8 +23,8 @@
                     <td>{{ event.getId() }}</td>
                 </tr>
                 <tr>
-                    <td>{% trans %}mautic.core.name{% endtrans %}</td>
-                    <td>{{ event.getName() }}</td>
+                    <td>{% trans %}mautic.events.conference_name{% endtrans %}</td>
+                    <td>{{ event.getConferenceName() }}</td>
                 </tr>
             </table>
             <!-- contacts section -->

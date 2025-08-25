@@ -27,12 +27,12 @@ class EventType extends AbstractType
             ],
         ]);
 
-        $builder->add('conferenceName', TextType::class, [
-            'label'      => 'mautic.events.conference_name',
+        $builder->add('name', TextType::class, [
+            'label'      => 'mautic.events.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'constraints' => [
-                new NotBlank(['message' => 'mautic.events.conference_name.required']),
+                new NotBlank(['message' => 'mautic.events.name.required']),
             ],
         ]);
 

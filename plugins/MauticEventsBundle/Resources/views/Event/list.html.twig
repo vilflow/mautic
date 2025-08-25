@@ -37,8 +37,8 @@
                                 }) }}
                                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                     'sessionVar': 'event',
-                                    'orderBy': 'e.conferenceName',
-                                    'text': 'mautic.events.conference_name',
+                                    'orderBy': 'e.name',
+                                    'text': 'mautic.events.name',
                                     'default': true
                                 }) }}
                                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -73,7 +73,7 @@
                                         }) }}
                                     </td>
                                     <td>
-                                        <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getConferenceName() }}</a>
+                                        <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
                                     </td>
                                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                                 </tr>

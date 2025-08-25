@@ -58,7 +58,7 @@ class EventContactRepository extends CommonRepository
             ->select('1')
             ->innerJoin('ec.event', 'e')
             ->andWhere('IDENTITY(ec.contact) = :contactId')
-            ->andWhere('e.conferenceName = :eventName')
+            ->andWhere('e.name = :eventName')
             ->setParameter('contactId', $contactId, ParameterType::INTEGER)
             ->setParameter('eventName', trim($eventName), ParameterType::STRING)
             ->setMaxResults(1);

@@ -25,12 +25,12 @@ class Event extends CommonEntity
     /**
      * @var string|null
      */
-    private $eventExternalId;
+    private $name;
 
     /**
      * @var string|null
      */
-    private $conferenceName;
+    private $eventExternalId;
 
     /**
      * @var string|null
@@ -84,16 +84,16 @@ class Event extends CommonEntity
             ->setCustomRepositoryClass(EventRepository::class);
 
         $builder->addId();
-        $builder->addField('eventExternalId', Types::STRING, ['unique' => true]);
-        $builder->addField('conferenceName', Types::STRING);
+        $builder->addField('eventExternalId', Types::STRING, ['columnName' => 'event_external_id', 'unique' => true]);
+        $builder->addField('name', Types::STRING, ['columnName' => 'name']);
         $builder->addField('website', Types::STRING, ['nullable' => true]);
         $builder->addField('currency', Types::STRING, ['nullable' => true, 'length' => 3]);
         $builder->addField('country', Types::STRING, ['nullable' => true]);
         $builder->addField('city', Types::STRING, ['nullable' => true]);
-        $builder->addField('registrationUrl', Types::STRING, ['nullable' => true]);
-        $builder->addField('suitecrmId', Types::STRING, ['nullable' => true]);
-        $builder->addField('createdAt', Types::DATETIME_MUTABLE, ['nullable' => true]);
-        $builder->addField('updatedAt', Types::DATETIME_MUTABLE, ['nullable' => true]);
+        $builder->addField('registrationUrl', Types::STRING, ['columnName' => 'registration_url', 'nullable' => true]);
+        $builder->addField('suitecrmId', Types::STRING, ['columnName' => 'suitecrm_id', 'nullable' => true]);
+        $builder->addField('createdAt', Types::DATETIME_MUTABLE, ['columnName' => 'created_at', 'nullable' => true]);
+        $builder->addField('updatedAt', Types::DATETIME_MUTABLE, ['columnName' => 'updated_at', 'nullable' => true]);
 
         $builder->createOneToMany('eventContacts', EventContact::class)
             ->mappedBy('event')
@@ -106,7 +106,7 @@ class Event extends CommonEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('eventExternalId', new NotBlank(['message' => 'mautic.events.event_external_id.required']));
-        $metadata->addPropertyConstraint('conferenceName', new NotBlank(['message' => 'mautic.events.conference_name.required']));
+        $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.events.name.required']));
     }
 
     public function __construct()
@@ -123,12 +123,12 @@ class Event extends CommonEntity
 
     public function getName(): ?string
     {
-        return $this->conferenceName;
+        return $this->name;
     }
 
     public function setName(string $name): self
     {
-        $this->conferenceName = $name;
+        $this->name = $name;
         $this->updatedAt = new \DateTime();
         return $this;
     }
@@ -168,18 +168,6 @@ class Event extends CommonEntity
     public function setEventExternalId(string $eventExternalId): self
     {
         $this->eventExternalId = $eventExternalId;
-        $this->updatedAt = new \DateTime();
-        return $this;
-    }
-
-    public function getConferenceName(): ?string
-    {
-        return $this->conferenceName;
-    }
-
-    public function setConferenceName(string $conferenceName): self
-    {
-        $this->conferenceName = $conferenceName;
         $this->updatedAt = new \DateTime();
         return $this;
     }

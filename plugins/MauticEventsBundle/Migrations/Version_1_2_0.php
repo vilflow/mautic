@@ -26,8 +26,8 @@ class Version_1_2_0 extends AbstractMauticMigration
             $this->addSql("ALTER TABLE $tableName ADD COLUMN event_external_id VARCHAR(191) NOT NULL");
         }
         
-        if (!$table->hasColumn('conference_name')) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN conference_name VARCHAR(191) NOT NULL");
+        if (!$table->hasColumn('name')) {
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN name VARCHAR(191) NOT NULL");
         }
         
         if (!$table->hasColumn('website')) {
@@ -35,11 +35,11 @@ class Version_1_2_0 extends AbstractMauticMigration
         }
         
         if (!$table->hasColumn('currency')) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN currency VARCHAR(3) DEFAULT NULL");
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN currency VARCHAR(10) DEFAULT NULL");
         }
         
         if (!$table->hasColumn('country')) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN country VARCHAR(2) DEFAULT NULL");
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN country VARCHAR(191) DEFAULT NULL");
         }
         
         if (!$table->hasColumn('city')) {

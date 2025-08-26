@@ -26,6 +26,48 @@
                     <td>{% trans %}mautic.events.name{% endtrans %}</td>
                     <td>{{ event.getName() }}</td>
                 </tr>
+                {% if event.getEventExternalId() %}
+                <tr>
+                    <td>{% trans %}mautic.events.event_external_id{% endtrans %}</td>
+                    <td>{{ event.getEventExternalId() }}</td>
+                </tr>
+                {% endif %}
+                {% if event.getCurrency() %}
+                <tr>
+                    <td>{% trans %}mautic.events.currency{% endtrans %}</td>
+                    <td>{{ event.getCurrency() }}</td>
+                </tr>
+                {% endif %}
+                {% if event.getCountry() %}
+                <tr>
+                    <td>{% trans %}mautic.events.country{% endtrans %}</td>
+                    <td>{{ event.getCountry() }}</td>
+                </tr>
+                {% endif %}
+                {% if event.getCity() %}
+                <tr>
+                    <td>{% trans %}mautic.events.city{% endtrans %}</td>
+                    <td>{{ event.getCity() }}</td>
+                </tr>
+                {% endif %}
+                {% if event.getWebsite() %}
+                <tr>
+                    <td>{% trans %}mautic.events.website{% endtrans %}</td>
+                    <td><a href="{{ event.getWebsite() }}" target="_blank" rel="noopener noreferrer">{{ event.getWebsite() }}</a></td>
+                </tr>
+                {% endif %}
+                {% if event.getSuitecrmId() %}
+                <tr>
+                    <td>{% trans %}mautic.events.suitecrm_id{% endtrans %}</td>
+                    <td>{{ event.getSuitecrmId() }}</td>
+                </tr>
+                {% endif %}
+                {% if event.getRegistrationUrl() %}
+                <tr>
+                    <td>{% trans %}mautic.events.registration_url{% endtrans %}</td>
+                    <td><a href="{{ event.getRegistrationUrl() }}" target="_blank" rel="noopener noreferrer">{{ event.getRegistrationUrl() }}</a></td>
+                </tr>
+                {% endif %}
             </table>
             <!-- contacts section -->
             <div class="pa-md enage">

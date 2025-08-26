@@ -191,4 +191,30 @@ class EventContactRepository extends CommonRepository
 
         return $qb->getQuery()->getOneOrNullResult() !== null;
     }
+
+    public function contactHasEventBySuitecrmId(int $contactId, string $operator, string $suitecrmId): bool
+    {
+        $qb = $this->createQueryBuilder('ec')
+            ->select('1')
+            ->innerJoin('ec.event', 'e')
+            ->andWhere('IDENTITY(ec.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setParameter('suitecrmId', trim($suitecrmId), ParameterType::STRING)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'eq':
+                $qb->andWhere('e.suitecrmId = :suitecrmId');
+                break;
+            case 'neq':
+                $qb->andWhere('e.suitecrmId != :suitecrmId OR e.suitecrmId IS NULL');
+                break;
+            case 'like':
+                $qb->andWhere('e.suitecrmId LIKE :suitecrmId');
+                $qb->setParameter('suitecrmId', '%' . trim($suitecrmId) . '%', ParameterType::STRING);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
 }

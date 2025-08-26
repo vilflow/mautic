@@ -12,6 +12,7 @@ use MauticPlugin\MauticEventsBundle\Form\Type\EventCityConditionType;
 use MauticPlugin\MauticEventsBundle\Form\Type\EventCountryConditionType;
 use MauticPlugin\MauticEventsBundle\Form\Type\EventCurrencyConditionType;
 use MauticPlugin\MauticEventsBundle\Form\Type\EventExternalIdConditionType;
+use MauticPlugin\MauticEventsBundle\Form\Type\EventSuitecrmIdConditionType;
 use MauticPlugin\MauticEventsBundle\Form\Type\EventWebsiteConditionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -85,6 +86,15 @@ class CampaignSubscriber implements EventSubscriberInterface
             'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('events.has_event_website', $condition);
+
+        // Event SuiteCRM ID Condition
+        $condition = [
+            'label'       => 'mautic.events.campaign.condition.has_event_suitecrm_id',
+            'description' => 'mautic.events.campaign.condition.has_event_suitecrm_id_descr',
+            'formType'    => EventSuitecrmIdConditionType::class,
+            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('events.has_event_suitecrm_id', $condition);
     }
 
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
@@ -166,6 +176,18 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             $hasEvent = $this->eventContactRepository->contactHasEventByWebsite($lead->getId(), 'eq', $website);
+            $event->setResult($hasEvent);
+            return;
+        }
+
+        // Event SuiteCRM ID Condition
+        if ($event->checkContext('events.has_event_suitecrm_id')) {
+            $suitecrmId = $config['suitecrm_id'] ?? '';
+            if (empty($suitecrmId)) {
+                $event->setResult(false);
+                return;
+            }
+            $hasEvent = $this->eventContactRepository->contactHasEventBySuitecrmId($lead->getId(), 'eq', $suitecrmId);
             $event->setResult($hasEvent);
             return;
         }

@@ -14,17 +14,6 @@ class EventCurrencyConditionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('operator', ChoiceType::class, [
-            'label'   => 'mautic.events.campaign.condition.operator',
-            'choices' => [
-                'mautic.core.operator.equals'    => 'eq',
-                'mautic.core.operator.notequals' => 'neq',
-            ],
-            'attr' => [
-                'class' => 'form-control',
-            ],
-        ]);
-
         $builder->add('currency', ChoiceType::class, [
             'label' => 'mautic.events.campaign.condition.currency',
             'choices' => [

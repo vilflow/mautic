@@ -111,13 +111,12 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Event City Condition
         if ($event->checkContext('events.has_event_city')) {
-            $operator = $config['operator'] ?? 'eq';
             $city = $config['city'] ?? '';
             if (empty($city)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByCity($lead->getId(), $operator, $city);
+            $hasEvent = $this->eventContactRepository->contactHasEventByCity($lead->getId(), 'eq', $city);
             $event->setResult($hasEvent);
             return;
         }
@@ -137,39 +136,36 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Event Currency Condition
         if ($event->checkContext('events.has_event_currency')) {
-            $operator = $config['operator'] ?? 'eq';
             $currency = $config['currency'] ?? '';
             if (empty($currency)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByCurrency($lead->getId(), $operator, $currency);
+            $hasEvent = $this->eventContactRepository->contactHasEventByCurrency($lead->getId(), 'eq', $currency);
             $event->setResult($hasEvent);
             return;
         }
 
         // Event External ID Condition
         if ($event->checkContext('events.has_event_external_id')) {
-            $operator = $config['operator'] ?? 'eq';
             $externalId = $config['external_id'] ?? '';
             if (empty($externalId)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByExternalId($lead->getId(), $operator, $externalId);
+            $hasEvent = $this->eventContactRepository->contactHasEventByExternalId($lead->getId(), 'eq', $externalId);
             $event->setResult($hasEvent);
             return;
         }
 
         // Event Website Condition
         if ($event->checkContext('events.has_event_website')) {
-            $operator = $config['operator'] ?? 'eq';
             $website = $config['website'] ?? '';
             if (empty($website)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByWebsite($lead->getId(), $operator, $website);
+            $hasEvent = $this->eventContactRepository->contactHasEventByWebsite($lead->getId(), 'eq', $website);
             $event->setResult($hasEvent);
             return;
         }

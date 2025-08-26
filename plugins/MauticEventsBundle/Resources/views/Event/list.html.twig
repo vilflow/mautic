@@ -6,150 +6,158 @@
 {% block headerTitle %}{{ 'mautic.events.header.index'|trans }}{% endblock %}
 
 {% block content %}
-    <div id="page-list-wrapper" class="panel panel-default">
-        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
-            'searchValue': searchValue,
-            'action': currentRoute,
-            'page_actions': {
-                'templateButtons': {
-                    'new': permissions['events:events:create']
+    {% if isIndex %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions['events:events:create']
+                    },
+                    'routeBase': 'event',
+                    'langVar': 'events'
                 },
-                'routeBase': 'event',
-                'langVar': 'events'
-            },
-            'bulk_actions': {
-                'langVar': 'events',
-                'routeBase': 'event',
-                'templateButtons': {
-                    'delete': permissions['events:events:delete']
+                'bulk_actions': {
+                    'langVar': 'events',
+                    'routeBase': 'event',
+                    'templateButtons': {
+                        'delete': permissions['events:events:delete']
+                    }
                 }
-            }
-        }) }}
-        <div class="page-list">
-            {% if items is defined and items is not empty %}
-                <div class="table-responsive">
-                    <table class="table table-hover" id="eventTable">
-                        <thead>
-                            <tr>
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'checkall': 'true',
-                                    'target': '#eventTable'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.name',
-                                    'text': 'mautic.events.name',
-                                    'default': true
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.currency',
-                                    'text': 'mautic.events.currency',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.country',
-                                    'text': 'mautic.events.country',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.city',
-                                    'text': 'mautic.events.city',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.website',
-                                    'text': 'mautic.events.website',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.registrationUrl',
-                                    'text': 'mautic.events.registration_url',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.suitecrmId',
-                                    'text': 'mautic.events.suitecrm_id',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.eventExternalId',
-                                    'text': 'mautic.events.event_external_id',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                                    'sessionVar': 'event',
-                                    'orderBy': 'e.id',
-                                    'text': 'mautic.core.id',
-                                    'class': 'visible-md visible-lg'
-                                }) }}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in items %}
-                                <tr>
-                                    <td>
-                                        {% set custom = [{
-                                            attr: {
-                                                href: path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}),
-                                                'data-toggle': 'ajax'
-                                            },
-                                            btnText: 'mautic.core.details',
-                                            iconClass: 'ri-information-line'
-                                        }] %}
-                                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
-                                            item: item,
-                                            templateButtons: {
-                                                edit: permissions['events:events:edit'],
-                                                delete: permissions['events:events:delete']
-                                            },
-                                            routeBase: 'event',
-                                            langVar: 'events',
-                                            customButtons: custom
-                                        }) }}
-                                    </td>
-                                    <td>
-                                        <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
-                                    </td>
-                                    <td class="visible-md visible-lg">{{ item.getCurrency() }}</td>
-                                    <td class="visible-md visible-lg">{{ item.getCountry() }}</td>
-                                    <td class="visible-md visible-lg">{{ item.getCity() }}</td>
-                                    <td class="visible-md visible-lg">
-                                        {% if item.getWebsite() %}
-                                            <a href="{{ item.getWebsite() }}" target="_blank">{{ item.getWebsite() }}</a>
-                                        {% endif %}
-                                    </td>
-                                    <td class="visible-md visible-lg">
-                                        {% if item.getRegistrationUrl() %}
-                                            <a href="{{ item.getRegistrationUrl() }}" target="_blank">{{ item.getRegistrationUrl() }}</a>
-                                        {% endif %}
-                                    </td>
-                                    <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
-                                    <td class="visible-md visible-lg">{{ item.getEventExternalId() }}</td>
-                                    <td class="visible-md visible-lg">{{ item.getId() }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="panel-footer">
-                        {{ include('@MauticCore/Helper/pagination.html.twig', {
-                            'totalItems': items|length,
-                            'page': page,
-                            'limit': limit,
-                            'baseUrl': path('mautic_event_index'),
-                            'sessionVar': 'event'
-                        }) }}
-                    </div>
-                </div>
-            {% else %}
-                {{ include('@MauticCore/Helper/noresults.html.twig') }}
-            {% endif %}
+            }) }}
+            <div class="page-list">
+                {{ block('mainContent') }}
+            </div>
         </div>
-    </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
+
+{% block mainContent %}
+    {% if items is defined and items is not empty %}
+        <div class="table-responsive">
+            <table class="table table-hover" id="eventTable">
+                <thead>
+                    <tr>
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'checkall': 'true',
+                            'target': '#eventTable'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.name',
+                            'text': 'mautic.events.name',
+                            'default': true
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.currency',
+                            'text': 'mautic.events.currency',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.country',
+                            'text': 'mautic.events.country',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.city',
+                            'text': 'mautic.events.city',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.website',
+                            'text': 'mautic.events.website',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.registrationUrl',
+                            'text': 'mautic.events.registration_url',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.suitecrmId',
+                            'text': 'mautic.events.suitecrm_id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.eventExternalId',
+                            'text': 'mautic.events.event_external_id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
+                            'orderBy': 'e.id',
+                            'text': 'mautic.core.id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>
+                                {% set custom = [{
+                                    attr: {
+                                        href: path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}),
+                                        'data-toggle': 'ajax'
+                                    },
+                                    btnText: 'mautic.core.details',
+                                    iconClass: 'ri-information-line'
+                                }] %}
+                                {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                    item: item,
+                                    templateButtons: {
+                                        edit: permissions['events:events:edit'],
+                                        delete: permissions['events:events:delete']
+                                    },
+                                    routeBase: 'event',
+                                    langVar: 'events',
+                                    customButtons: custom
+                                }) }}
+                            </td>
+                            <td>
+                                <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getCurrency() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getCountry() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getCity() }}</td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getWebsite() %}
+                                    <a href="{{ item.getWebsite() }}" target="_blank">{{ item.getWebsite() }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getRegistrationUrl() %}
+                                    <a href="{{ item.getRegistrationUrl() }}" target="_blank">{{ item.getRegistrationUrl() }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getEventExternalId() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'baseUrl': path('mautic_event_index'),
+                    'sessionVar': 'event'
+                }) }}
+            </div>
+        </div>
+    {% else %}
+        {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% endif %}
 {% endblock %}

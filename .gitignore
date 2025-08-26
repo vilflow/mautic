@@ -119,6 +119,7 @@
 !/plugins/MauticZapierBundle
 !/plugins/MauticTagManagerBundle
 !/plugins/MauticEventsBundle
+!/plugins/MauticOpportunitiesBundle
 !/plugins/index.html
 !/plugins/.gitkeep
 

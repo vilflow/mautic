@@ -1,5 +1,5 @@
-Mautic.eventOnLoad = function (container, response) {
-    var tablePanel = mQuery(container + ' #event-contacts-table');
+Mautic.opportunityOnLoad = function (container, response) {
+    var tablePanel = mQuery(container + ' #opportunity-contacts-table');
     if (!tablePanel.length) {
         return;
     }
@@ -75,14 +75,14 @@ Mautic.eventOnLoad = function (container, response) {
         if (!contacts.length) {
             return '<div class="panel"><div class="panel-body text-center">' +
                    '<h4>No attached contacts</h4>' +
-                   '<p class="text-muted">Use the form above to attach contacts to this event.</p>' +
+                   '<p class="text-muted">Use the form above to attach contacts to this opportunity.</p>' +
                    '</div></div>';
         }
         
         var html = '<div class="table-responsive">' +
-                   '<table class="table table-hover" id="eventContactsTable">' +
+                   '<table class="table table-hover" id="opportunityContactsTable">' +
                    '<thead><tr>' +
-                   '<th width="1%"><input type="checkbox" data-toggle="checkall" data-target="#eventContactsTable"></th>' +
+                   '<th width="1%"><input type="checkbox" data-toggle="checkall" data-target="#opportunityContactsTable"></th>' +
                    '<th>Name</th>' +
                    '<th class="visible-md visible-lg">Email</th>' +
                    '<th class="visible-md visible-lg">Location</th>' +

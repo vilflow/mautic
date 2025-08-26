@@ -1,4 +1,4 @@
-/* Event Details Page Styles */
+/* Opportunity Details Page Styles */
 .detail-item {
     margin-bottom: 15px;
 }
@@ -139,7 +139,7 @@
 }
 
 /* Table improvements */
-#event-contacts-table {
+#opportunity-contacts-table {
     margin-top: 20px;
 }
 

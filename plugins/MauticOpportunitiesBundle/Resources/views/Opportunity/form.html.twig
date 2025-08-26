@@ -1,0 +1,80 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}opportunity{% endblock %}
+
+{% block headerTitle %}
+    {% if entity.id %}
+        {{ 'mautic.opportunities.menu.edit'|trans({'%name%': entity.name}) }}
+    {% else %}
+        {{ 'mautic.opportunities.menu.new'|trans }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-12 height-auto">
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.opportunityExternalId) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.name) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.contact) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.event) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.stage) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.amount) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractReviewResultUrl) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.invoiceUrl) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.invitationUrl) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.suitecrmId) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    {#    {% if entity.id %}#}
+    {#        <div id="event-contacts"#}
+    {#             data-event-id="{{ entity.id }}"#}
+    {#             data-contacts-url="{{ path('mautic_event_contacts', {'objectId': entity.id}) }}"#}
+    {#             data-search-url="{{ path('mautic_event_contacts_search', {'objectId': entity.id}) }}"#}
+    {#             data-attach-url="{{ path('mautic_event_contacts_attach', {'objectId': entity.id}) }}"#}
+    {#             data-detach-url-template="{{ path('mautic_event_contacts_detach', {'objectId': entity.id, 'contactId': 'CONTACT_ID'}) }}"#}
+    {#             data-remove-label="{{ 'events.contact.remove'|trans }}"#}
+    {#             data-search-placeholder="{{ 'events.contact.search_placeholder'|trans }}">#}
+    {#            <h3>{% trans %}events.contact.panel{% endtrans %}</h3>#}
+    {#            <div class="form-group">#}
+    {#                <select id="contact-search" class="form-control" multiple aria-label="{% trans %}events.contact.search_placeholder{% endtrans %}"></select>#}
+    {#                <button id="attach-contacts" class="btn btn-primary mt-2" disabled>{% trans %}events.contact.attach{% endtrans %}</button>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#        {{ includeScript('plugins/MauticEventsBundle/Assets/js/events.js') }}#}
+    {#    {% endif %}#}
+{% endblock %}

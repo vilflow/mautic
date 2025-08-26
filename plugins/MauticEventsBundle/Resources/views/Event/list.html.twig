@@ -43,6 +43,48 @@
                                 }) }}
                                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                     'sessionVar': 'event',
+                                    'orderBy': 'e.currency',
+                                    'text': 'mautic.events.currency',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.country',
+                                    'text': 'mautic.events.country',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.city',
+                                    'text': 'mautic.events.city',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.website',
+                                    'text': 'mautic.events.website',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.registrationUrl',
+                                    'text': 'mautic.events.registration_url',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.suitecrmId',
+                                    'text': 'mautic.events.suitecrm_id',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
+                                    'orderBy': 'e.eventExternalId',
+                                    'text': 'mautic.events.event_external_id',
+                                    'class': 'visible-md visible-lg'
+                                }) }}
+                                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                    'sessionVar': 'event',
                                     'orderBy': 'e.id',
                                     'text': 'mautic.core.id',
                                     'class': 'visible-md visible-lg'
@@ -75,6 +117,21 @@
                                     <td>
                                         <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
                                     </td>
+                                    <td class="visible-md visible-lg">{{ item.getCurrency() }}</td>
+                                    <td class="visible-md visible-lg">{{ item.getCountry() }}</td>
+                                    <td class="visible-md visible-lg">{{ item.getCity() }}</td>
+                                    <td class="visible-md visible-lg">
+                                        {% if item.getWebsite() %}
+                                            <a href="{{ item.getWebsite() }}" target="_blank">{{ item.getWebsite() }}</a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="visible-md visible-lg">
+                                        {% if item.getRegistrationUrl() %}
+                                            <a href="{{ item.getRegistrationUrl() }}" target="_blank">{{ item.getRegistrationUrl() }}</a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
+                                    <td class="visible-md visible-lg">{{ item.getEventExternalId() }}</td>
                                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                                 </tr>
                             {% endfor %}

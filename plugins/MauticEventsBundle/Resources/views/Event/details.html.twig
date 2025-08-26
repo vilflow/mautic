@@ -19,7 +19,7 @@
         <!-- Left Column - Event Details -->
         <div class="col-md-8 height-auto">
             <!-- Event Overview Card -->
-            <div class="panel panel-primary mb-8">
+            <div class="panel panel-default  mb-8">
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <i class="fa fa-calendar mr-2"></i>
@@ -96,7 +96,7 @@
 
 
             <!-- Contacts Management Card -->
-            <div class="panel panel-success">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <i class="fa fa-users mr-2"></i>
@@ -106,7 +106,7 @@
                 <div class="panel-body">
                     <!-- Add Contacts Form -->
                     <div class="row mb-3">
-                        <div class="col-md-8">
+                        <div class="col-md-10">
                             <div class="form-group">
                                 <label for="contact-search">{% trans %}events.contact.search_placeholder{% endtrans %}</label>
                                 <select id="contact-search" class="form-control" multiple 
@@ -117,7 +117,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label>&nbsp;</label>
                             <button id="attach-contacts" class="btn btn-primary btn-block btn-nospin" disabled
                                     data-attach-url="{{ path('mautic_event_contacts_attach', {'objectId': event.getId()}) }}">

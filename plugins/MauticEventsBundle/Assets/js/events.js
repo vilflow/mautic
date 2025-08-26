@@ -49,8 +49,15 @@ Mautic.eventOnLoad = function (container, response) {
                 return r.json();
             })
             .then(function(data){
-                var tableHtml = renderContactsTable(data.contacts || []);
+                var contacts = data.contacts || [];
+                var tableHtml = renderContactsTable(contacts);
                 tablePanel[0].innerHTML = tableHtml;
+                
+                // Update the total contacts count
+                var totalContactsEl = mQuery('#total-contacts');
+                if (totalContactsEl.length) {
+                    totalContactsEl.text(contacts.length);
+                }
                 
                 // Attach event listeners to remove buttons
                 mQuery(tablePanel).find('.btn-remove-contact').on('click', function(e){

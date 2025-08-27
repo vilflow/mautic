@@ -11,6 +11,11 @@ use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityStageConditionTy
 use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityAmountConditionType;
 use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityExternalIdConditionType;
 use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunitySuitecrmIdConditionType;
+use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityNameConditionType;
+use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityEventConditionType;
+use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityAbstractReviewResultUrlConditionType;
+use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityInvoiceUrlConditionType;
+use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityInvitationUrlConditionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -65,6 +70,51 @@ class CampaignSubscriber implements EventSubscriberInterface
             'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('opportunities.has_opportunity_suitecrm_id', $condition);
+
+        // Opportunity Name Condition
+        $condition = [
+            'label'       => 'mautic.opportunities.campaign.condition.has_opportunity_name',
+            'description' => 'mautic.opportunities.campaign.condition.has_opportunity_name_descr',
+            'formType'    => OpportunityNameConditionType::class,
+            'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('opportunities.has_opportunity_name', $condition);
+
+        // Opportunity Event Condition
+        $condition = [
+            'label'       => 'mautic.opportunities.campaign.condition.has_opportunity_event',
+            'description' => 'mautic.opportunities.campaign.condition.has_opportunity_event_descr',
+            'formType'    => OpportunityEventConditionType::class,
+            'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('opportunities.has_opportunity_event', $condition);
+
+        // Opportunity Abstract Review Result URL Condition
+        $condition = [
+            'label'       => 'mautic.opportunities.campaign.condition.has_opportunity_abstract_review_result_url',
+            'description' => 'mautic.opportunities.campaign.condition.has_opportunity_abstract_review_result_url_descr',
+            'formType'    => OpportunityAbstractReviewResultUrlConditionType::class,
+            'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('opportunities.has_abstract_url', $condition);
+
+        // Opportunity Invoice URL Condition
+        $condition = [
+            'label'       => 'mautic.opportunities.campaign.condition.has_opportunity_invoice_url',
+            'description' => 'mautic.opportunities.campaign.condition.has_opportunity_invoice_url_descr',
+            'formType'    => OpportunityInvoiceUrlConditionType::class,
+            'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('opportunities.has_invoice_url', $condition);
+
+        // Opportunity Invitation URL Condition
+        $condition = [
+            'label'       => 'mautic.opportunities.campaign.condition.has_opportunity_invitation_url',
+            'description' => 'mautic.opportunities.campaign.condition.has_opportunity_invitation_url_descr',
+            'formType'    => OpportunityInvitationUrlConditionType::class,
+            'eventName'   => MauticOpportunitiesEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('opportunities.has_invitation_url', $condition);
     }
 
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
@@ -144,6 +194,85 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $lead->getId(), 
                 $operator, 
                 $suitecrmId
+            );
+            $event->setResult($hasOpportunity);
+            return;
+        }
+
+        // Opportunity Name Condition
+        if ($event->checkContext('opportunities.has_opportunity_name')) {
+            $name = $config['name'] ?? '';
+            if (empty($name)) {
+                $event->setResult(false);
+                return;
+            }
+            
+            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByName(
+                $lead->getId(), 
+                'like', 
+                $name
+            );
+            $event->setResult($hasOpportunity);
+            return;
+        }
+
+        // Opportunity Event Condition
+        if ($event->checkContext('opportunities.has_opportunity_event')) {
+            $eventId = $config['event'] ?? '';
+            if (empty($eventId)) {
+                $event->setResult(false);
+                return;
+            }
+            
+            // Convert string to integer if needed
+            $eventId = is_numeric($eventId) ? (int) $eventId : $eventId;
+            
+            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByEvent(
+                $lead->getId(), 
+                'eq', 
+                $eventId
+            );
+            $event->setResult($hasOpportunity);
+            return;
+        }
+
+        // Opportunity Abstract Review Result URL Condition
+        if ($event->checkContext('opportunities.has_abstract_url')) {
+            $url = $config['abstract_review_result_url'] ?? '';
+            $operator = empty($url) ? 'not_empty' : 'like';
+            
+            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByAbstractReviewResultUrl(
+                $lead->getId(), 
+                $operator, 
+                $url
+            );
+            $event->setResult($hasOpportunity);
+            return;
+        }
+
+        // Opportunity Invoice URL Condition
+        if ($event->checkContext('opportunities.has_invoice_url')) {
+            $url = $config['invoice_url'] ?? '';
+            $operator = empty($url) ? 'not_empty' : 'like';
+            
+            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByInvoiceUrl(
+                $lead->getId(), 
+                $operator, 
+                $url
+            );
+            $event->setResult($hasOpportunity);
+            return;
+        }
+
+        // Opportunity Invitation URL Condition
+        if ($event->checkContext('opportunities.has_invitation_url')) {
+            $url = $config['invitation_url'] ?? '';
+            $operator = empty($url) ? 'not_empty' : 'like';
+            
+            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByInvitationUrl(
+                $lead->getId(), 
+                $operator, 
+                $url
             );
             $event->setResult($hasOpportunity);
             return;

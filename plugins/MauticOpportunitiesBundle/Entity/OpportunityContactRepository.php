@@ -159,4 +159,144 @@ class OpportunityContactRepository extends CommonRepository
 
         return $qb->getQuery()->getOneOrNullResult() !== null;
     }
+
+    public function contactHasOpportunityByName(int $contactId, string $operator, string $name): bool
+    {
+        $qb = $this->createQueryBuilder('oc')
+            ->select('1')
+            ->innerJoin('oc.opportunity', 'o')
+            ->andWhere('IDENTITY(oc.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setParameter('name', trim($name), ParameterType::STRING)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'eq':
+                $qb->andWhere('o.name = :name');
+                break;
+            case 'neq':
+                $qb->andWhere('o.name != :name OR o.name IS NULL');
+                break;
+            case 'like':
+                $qb->andWhere('o.name LIKE :name');
+                $qb->setParameter('name', '%' . trim($name) . '%', ParameterType::STRING);
+                break;
+            case 'notlike':
+                $qb->andWhere('o.name NOT LIKE :name OR o.name IS NULL');
+                $qb->setParameter('name', '%' . trim($name) . '%', ParameterType::STRING);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
+
+    public function contactHasOpportunityByEvent(int $contactId, string $operator, $eventId): bool
+    {
+        $qb = $this->createQueryBuilder('oc')
+            ->select('1')
+            ->innerJoin('oc.opportunity', 'o')
+            ->andWhere('IDENTITY(oc.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'eq':
+                $qb->andWhere('IDENTITY(o.event) = :eventId')
+                   ->setParameter('eventId', $eventId, ParameterType::INTEGER);
+                break;
+            case 'neq':
+                $qb->andWhere('IDENTITY(o.event) != :eventId OR o.event IS NULL')
+                   ->setParameter('eventId', $eventId, ParameterType::INTEGER);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
+
+    public function contactHasOpportunityByAbstractReviewResultUrl(int $contactId, string $operator, string $url = ''): bool
+    {
+        $qb = $this->createQueryBuilder('oc')
+            ->select('1')
+            ->innerJoin('oc.opportunity', 'o')
+            ->andWhere('IDENTITY(oc.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'empty':
+                $qb->andWhere('o.abstractReviewResultUrl IS NULL OR o.abstractReviewResultUrl = \'\'');
+                break;
+            case 'not_empty':
+                $qb->andWhere('o.abstractReviewResultUrl IS NOT NULL AND o.abstractReviewResultUrl != \'\'');
+                break;
+            case 'like':
+                $qb->andWhere('o.abstractReviewResultUrl LIKE :url')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+            case 'notlike':
+                $qb->andWhere('o.abstractReviewResultUrl NOT LIKE :url OR o.abstractReviewResultUrl IS NULL')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
+
+    public function contactHasOpportunityByInvoiceUrl(int $contactId, string $operator, string $url = ''): bool
+    {
+        $qb = $this->createQueryBuilder('oc')
+            ->select('1')
+            ->innerJoin('oc.opportunity', 'o')
+            ->andWhere('IDENTITY(oc.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'empty':
+                $qb->andWhere('o.invoiceUrl IS NULL OR o.invoiceUrl = \'\'');
+                break;
+            case 'not_empty':
+                $qb->andWhere('o.invoiceUrl IS NOT NULL AND o.invoiceUrl != \'\'');
+                break;
+            case 'like':
+                $qb->andWhere('o.invoiceUrl LIKE :url')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+            case 'notlike':
+                $qb->andWhere('o.invoiceUrl NOT LIKE :url OR o.invoiceUrl IS NULL')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
+
+    public function contactHasOpportunityByInvitationUrl(int $contactId, string $operator, string $url = ''): bool
+    {
+        $qb = $this->createQueryBuilder('oc')
+            ->select('1')
+            ->innerJoin('oc.opportunity', 'o')
+            ->andWhere('IDENTITY(oc.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER)
+            ->setMaxResults(1);
+
+        switch ($operator) {
+            case 'empty':
+                $qb->andWhere('o.invitationUrl IS NULL OR o.invitationUrl = \'\'');
+                break;
+            case 'not_empty':
+                $qb->andWhere('o.invitationUrl IS NOT NULL AND o.invitationUrl != \'\'');
+                break;
+            case 'like':
+                $qb->andWhere('o.invitationUrl LIKE :url')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+            case 'notlike':
+                $qb->andWhere('o.invitationUrl NOT LIKE :url OR o.invitationUrl IS NULL')
+                   ->setParameter('url', '%' . trim($url) . '%', ParameterType::STRING);
+                break;
+        }
+
+        return $qb->getQuery()->getOneOrNullResult() !== null;
+    }
 }

@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
+use MauticPlugin\MauticEventsBundle\Segment\Query\Filter\EventFieldFilterQueryBuilder;
 use MauticPlugin\MauticEventsBundle\Entity\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -97,108 +98,17 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
 
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {
-        // Event Name
-        $event->addTranslation('event_name', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'name',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
+        // Use custom EventFieldFilterQueryBuilder for event segment filters
+        $eventFields = [
+            'event_name', 'event_city', 'event_country', 'event_currency',
+            'event_website', 'event_external_id', 'event_suitecrm_id', 'event_registration_url'
+        ];
 
-        // Event City
-        $event->addTranslation('event_city', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'city',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event Country
-        $event->addTranslation('event_country', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'country',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event Currency
-        $event->addTranslation('event_currency', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'currency',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event Website
-        $event->addTranslation('event_website', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'website',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event External ID
-        $event->addTranslation('event_external_id', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'event_external_id',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event SuiteCRM ID
-        $event->addTranslation('event_suitecrm_id', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'suitecrm_id',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
-
-        // Event Registration URL
-        $event->addTranslation('event_registration_url', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'event_contacts',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'registration_url',
-            'join_table'          => 'events',
-            'join_table_column'   => 'id',
-            'foreign_join_column' => 'event_id',
-        ]);
+        foreach ($eventFields as $fieldName) {
+            $event->addTranslation($fieldName, [
+                'type' => EventFieldFilterQueryBuilder::getServiceId(),
+                'field' => $fieldName,
+            ]);
+        }
     }
 }

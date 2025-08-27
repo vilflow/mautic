@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
+use MauticPlugin\MauticOpportunitiesBundle\Segment\Query\Filter\OpportunityFieldFilterQueryBuilder;
 use MauticPlugin\MauticOpportunitiesBundle\Entity\Opportunity;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -100,85 +101,26 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
 
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {
-        // Opportunity Name
-        $event->addTranslation('opportunity_name', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'name',
-        ]);
+        // Use custom OpportunityFieldFilterQueryBuilder for opportunity segment filters
+        $opportunityFields = [
+            'opportunity_name', 'opportunity_stage', 'opportunity_amount',
+            'opportunity_external_id', 'opportunity_suitecrm_id', 
+            'opportunity_abstract_review_result_url', 'opportunity_invoice_url',
+            'opportunity_invitation_url'
+        ];
 
-        // Opportunity Stage
-        $event->addTranslation('opportunity_stage', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'stage',
-        ]);
+        foreach ($opportunityFields as $fieldName) {
+            $config = [
+                'type' => OpportunityFieldFilterQueryBuilder::getServiceId(),
+                'field' => $fieldName,
+            ];
 
-        // Opportunity Amount  
-        $event->addTranslation('opportunity_amount', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'amount',
-            'null_value'          => 0,
-        ]);
+            // Add null_value for amount field to handle empty values properly
+            if ($fieldName === 'opportunity_amount') {
+                $config['null_value'] = 0;
+            }
 
-        // Opportunity External ID
-        $event->addTranslation('opportunity_external_id', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'opportunity_external_id',
-        ]);
-
-        // Opportunity SuiteCRM ID
-        $event->addTranslation('opportunity_suitecrm_id', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'suitecrm_id',
-        ]);
-
-        // Opportunity Abstract Review Result URL
-        $event->addTranslation('opportunity_abstract_review_result_url', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'abstract_review_result_url',
-        ]);
-
-        // Opportunity Invoice URL
-        $event->addTranslation('opportunity_invoice_url', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'invoice_url',
-        ]);
-
-        // Opportunity Invitation URL
-        $event->addTranslation('opportunity_invitation_url', [
-            'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table'       => 'opportunities',
-            'foreign_table_field' => 'contact_id',
-            'table'               => 'leads',
-            'table_field'         => 'id',
-            'field'               => 'invitation_url',
-        ]);
+            $event->addTranslation($fieldName, $config);
+        }
     }
 }

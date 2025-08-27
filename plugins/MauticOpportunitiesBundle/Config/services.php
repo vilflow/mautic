@@ -21,4 +21,8 @@ return static function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias('mautic.opportunity.model.opportunity', MauticPlugin\MauticOpportunitiesBundle\Model\OpportunityModel::class);
+
+    // Register custom segment filter query builder
+    $services->set('mautic.opportunities.segment.query.builder.opportunity_field', MauticPlugin\MauticOpportunitiesBundle\Segment\Query\Filter\OpportunityFieldFilterQueryBuilder::class)
+        ->public();
 };

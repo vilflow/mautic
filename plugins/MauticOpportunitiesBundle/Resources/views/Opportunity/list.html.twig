@@ -47,6 +47,12 @@
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'opportunity',
+                            'orderBy': 'o.id',
+                            'text': 'mautic.core.id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
                             'orderBy': 'o.name',
                             'text': 'mautic.opportunities.name',
                             'default': true
@@ -103,12 +109,6 @@
                             'text': 'mautic.opportunities.opportunity_external_id',
                             'class': 'visible-md visible-lg'
                         }) }}
-                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                            'sessionVar': 'opportunity',
-                            'orderBy': 'o.id',
-                            'text': 'mautic.core.id',
-                            'class': 'visible-md visible-lg'
-                        }) }}
                     </tr>
                 </thead>
                 <tbody>
@@ -134,6 +134,7 @@
                                     customButtons: custom
                                 }) }}
                             </td>
+                            <td class="visible-md visible-lg">{{ item.getId() }}</td>   
                             <td>
                                 <a href="{{ path('mautic_opportunity_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
                             </td>
@@ -166,7 +167,6 @@
                             </td>
                             <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
                             <td class="visible-md visible-lg">{{ item.getOpportunityExternalId() }}</td>
-                            <td class="visible-md visible-lg">{{ item.getId() }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -14,15 +14,15 @@ return static function (ContainerConfigurator $configurator): void {
 
     $excludes = [];
 
-    $services->load('MauticPlugin\\MauticEventsBundle\\', '../')
+    $services->load('MauticPlugin\\MauticOpportunitiesBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('MauticPlugin\\MauticEventsBundle\\Entity\\', '../Entity/*Repository.php')
+    $services->load('MauticPlugin\\MauticOpportunitiesBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.event.model.event', MauticPlugin\MauticEventsBundle\Model\EventModel::class);
+    $services->alias('mautic.opportunity.model.opportunity', MauticPlugin\MauticOpportunitiesBundle\Model\OpportunityModel::class);
 
     // Register custom segment filter query builder
-    $services->set('mautic.events.segment.query.builder.event_field', MauticPlugin\MauticEventsBundle\Segment\Query\Filter\EventFieldFilterQueryBuilder::class)
+    $services->set('mautic.opportunities.segment.query.builder.opportunity_field', MauticPlugin\MauticOpportunitiesBundle\Segment\Query\Filter\OpportunityFieldFilterQueryBuilder::class)
         ->public();
 };

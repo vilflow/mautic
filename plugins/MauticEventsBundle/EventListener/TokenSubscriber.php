@@ -28,16 +28,16 @@ class TokenSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        $event->addTokensFromHelper('Event', 'event', [
-            'name' => 'mautic.events.token.name',
-            'conference_name' => 'mautic.events.token.conference_name',
-            'city' => 'mautic.events.token.city',
-            'country' => 'mautic.events.token.country',
-            'currency' => 'mautic.events.token.currency',
-            'website' => 'mautic.events.token.website',
-            'registration_url' => 'mautic.events.token.registration_url',
-            'external_id' => 'mautic.events.token.external_id',
-            'suitecrm_id' => 'mautic.events.token.suitecrm_id',
+        $event->addTokens([
+            '{event.name}' => 'mautic.events.token.name',
+            '{event.conference_name}' => 'mautic.events.token.conference_name',
+            '{event.city}' => 'mautic.events.token.city',
+            '{event.country}' => 'mautic.events.token.country',
+            '{event.currency}' => 'mautic.events.token.currency',
+            '{event.website}' => 'mautic.events.token.website',
+            '{event.registration_url}' => 'mautic.events.token.registration_url',
+            '{event.external_id}' => 'mautic.events.token.external_id',
+            '{event.suitecrm_id}' => 'mautic.events.token.suitecrm_id',
         ]);
     }
 

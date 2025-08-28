@@ -31,11 +31,11 @@ class OpportunityFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterParametersHolder = $filter->getParameterHolder($parameters);
         $tableAlias = $this->generateRandomParameterName();
 
-        // Create subquery to find contacts with matching opportunity criteria
+        // Create subquery to find contacts with matching opportunity criteria (using direct contact_id relationship)
         $subQueryBuilder = $queryBuilder->createQueryBuilder();
-        $subQueryBuilder->select($tableAlias.'_oc.contact_id')
-                       ->from(MAUTIC_TABLE_PREFIX.'opportunity_contacts', $tableAlias.'_oc')
-                       ->innerJoin($tableAlias.'_oc', MAUTIC_TABLE_PREFIX.'opportunities', $tableAlias.'_o', $tableAlias.'_oc.opportunity_id = '.$tableAlias.'_o.id');
+        $subQueryBuilder->select($tableAlias.'_o.contact_id')
+                       ->from(MAUTIC_TABLE_PREFIX.'opportunities', $tableAlias.'_o')
+                       ->where($tableAlias.'_o.contact_id IS NOT NULL');
 
         // Map filter field names to actual column names
         $fieldColumn = $this->mapFilterFieldToColumn($filter->getField());

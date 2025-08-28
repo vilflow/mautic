@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticOpportunitiesBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityContact;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,7 +115,8 @@ class OpportunityController extends AbstractStandardFormController
         }
         $page       = $request->query->getInt('page', 1);
         $limit      = $request->query->getInt('limit', 10);
-        $excludeIds = $this->doctrine->getRepository(OpportunityContact::class)->getAttachedContactIds($opportunity);
+        // Since opportunities now have a direct contact relationship, exclude the currently attached contact
+        $excludeIds = $opportunity->getContact() ? [$opportunity->getContact()->getId()] : [];
         $selected   = $request->query->get('exclude');
         if (!is_array($selected)) {
             $selected = $selected !== null ? [$selected] : [];
@@ -146,7 +146,10 @@ class OpportunityController extends AbstractStandardFormController
             return $this->badRequest('Invalid contactIds');
         }
 
-        $model->attachContacts($opportunity, array_map('intval', $ids));
+        // Since opportunities now have a direct contact relationship, only attach the first contact
+        if (!empty($ids)) {
+            $model->attachContact($opportunity, (int) $ids[0]);
+        }
 
         foreach ($ids as $id) {
             $this->dispatcher->dispatch(new GenericEvent(null, [
@@ -173,7 +176,7 @@ class OpportunityController extends AbstractStandardFormController
             return $this->notFound('opportunity', $objectId);
         }
 
-        $model->detachContact($opportunity, (int) $contactId);
+        $model->detachContact($opportunity);
 
         $this->dispatcher->dispatch(new GenericEvent(null, [
             'opportunityId' => $opportunity->getId(),

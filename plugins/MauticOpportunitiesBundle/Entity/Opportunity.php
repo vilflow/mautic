@@ -6,9 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityContact;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticEventsBundle\Entity\Event;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -84,10 +81,6 @@ class Opportunity extends CommonEntity
      */
     private $updatedAt;
 
-    /**
-     * @var Collection<int, OpportunityContact>
-     */
-    private $opportunityContacts;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -115,12 +108,6 @@ class Opportunity extends CommonEntity
         $builder->addField('suitecrmId', Types::STRING, ['columnName' => 'suitecrm_id', 'nullable' => true]);
         $builder->addField('createdAt', Types::DATETIME_MUTABLE, ['columnName' => 'created_at', 'nullable' => true]);
         $builder->addField('updatedAt', Types::DATETIME_MUTABLE, ['columnName' => 'updated_at', 'nullable' => true]);
-
-        $builder->createOneToMany('opportunityContacts', OpportunityContact::class)
-            ->mappedBy('opportunity')
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -132,7 +119,6 @@ class Opportunity extends CommonEntity
 
     public function __construct()
     {
-        $this->opportunityContacts = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->stage = 'Submitted';
@@ -155,32 +141,6 @@ class Opportunity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return Collection<int, OpportunityContact>
-     */
-    public function getOpportunityContacts(): Collection
-    {
-        return $this->opportunityContacts;
-    }
-
-    public function addOpportunityContact(OpportunityContact $opportunityContact): self
-    {
-        if (!$this->opportunityContacts->contains($opportunityContact)) {
-            $this->opportunityContacts->add($opportunityContact);
-            $opportunityContact->setOpportunity($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOpportunityContact(OpportunityContact $opportunityContact): self
-    {
-        if ($this->opportunityContacts->removeElement($opportunityContact)) {
-            $opportunityContact->setOpportunity($this);
-        }
-
-        return $this;
-    }
 
     public function getOpportunityExternalId(): ?string
     {

@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticOpportunitiesBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityContactRepository;
+use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityRepository;
 use MauticPlugin\MauticOpportunitiesBundle\MauticOpportunitiesEvents;
 use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityStageConditionType;
 use MauticPlugin\MauticOpportunitiesBundle\Form\Type\OpportunityAmountConditionType;
@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private OpportunityContactRepository $opportunityContactRepository
+        private OpportunityRepository $opportunityRepository
     ) {
     }
 
@@ -136,7 +136,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByStage(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByStage(
                 $lead->getId(), 
                 $operator, 
                 $stage
@@ -154,7 +154,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByAmount(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByAmount(
                 $lead->getId(), 
                 $operator, 
                 (float) $amount
@@ -172,7 +172,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByExternalId(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByExternalId(
                 $lead->getId(), 
                 $operator, 
                 $externalId
@@ -190,7 +190,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityBySuitecrmId(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityBySuitecrmId(
                 $lead->getId(), 
                 $operator, 
                 $suitecrmId
@@ -207,7 +207,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByName(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByName(
                 $lead->getId(), 
                 'like', 
                 $name
@@ -227,7 +227,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             // Convert string to integer if needed
             $eventId = is_numeric($eventId) ? (int) $eventId : $eventId;
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByEvent(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByEvent(
                 $lead->getId(), 
                 'eq', 
                 $eventId
@@ -241,7 +241,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $url = $config['abstract_review_result_url'] ?? '';
             $operator = empty($url) ? 'not_empty' : 'like';
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByAbstractReviewResultUrl(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByAbstractReviewResultUrl(
                 $lead->getId(), 
                 $operator, 
                 $url
@@ -255,7 +255,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $url = $config['invoice_url'] ?? '';
             $operator = empty($url) ? 'not_empty' : 'like';
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByInvoiceUrl(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByInvoiceUrl(
                 $lead->getId(), 
                 $operator, 
                 $url
@@ -269,7 +269,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $url = $config['invitation_url'] ?? '';
             $operator = empty($url) ? 'not_empty' : 'like';
             
-            $hasOpportunity = $this->opportunityContactRepository->contactHasOpportunityByInvitationUrl(
+            $hasOpportunity = $this->opportunityRepository->contactHasOpportunityByInvitationUrl(
                 $lead->getId(), 
                 $operator, 
                 $url

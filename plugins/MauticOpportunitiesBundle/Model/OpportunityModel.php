@@ -9,9 +9,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityContact;
 use MauticPlugin\MauticOpportunitiesBundle\Entity\Opportunity;
-use MauticPlugin\MauticOpportunitiesBundle\Entity\OpportunityContactRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -87,35 +85,30 @@ class OpportunityModel extends FormModel
     }
 
     /**
-     * Returns contacts attached to opportunity.
+     * Returns the contact attached to the opportunity.
      *
-     * @return array{total:int,contacts:array<int,array{id:int,name:string,email:?string,city:?string,state:?string,country:?string,stage:?string,points:int,lastActive:?string}}>
+     * @return array{total:int,contacts:array<int,array{id:int,name:string,email:?string,city:?string,state:?string,country:?string,stage:?string,points:int,lastActive:?string}>}
      */
     public function getAttachedContacts(Opportunity $opportunity, int $page = 1, int $limit = 20): array
     {
-        /** @var OpportunityContactRepository $repo */
-        $repo   = $this->em->getRepository(OpportunityContact::class);
-        $offset = ($page - 1) * $limit;
-        $rows   = $repo->getAttachedContacts($opportunity, $limit, $offset);
-        $total  = $repo->countAttachedContacts($opportunity);
-
+        $contact = $opportunity->getContact();
         $contacts = [];
-        foreach ($rows as $row) {
-            $lead       = $row->getContact();
+        
+        if ($contact) {
             $contacts[] = [
-                'id'         => $lead->getId(),
-                'name'       => trim(($lead->getFirstname() ?? '').' '.($lead->getLastname() ?? '')) ?: $lead->getEmail(),
-                'email'      => $lead->getEmail(),
-                'city'       => $lead->getCity(),
-                'state'      => $lead->getState(),
-                'country'    => $lead->getCountry(),
-                'stage'      => $lead->getStage() ? $lead->getStage()->getName() : null,
-                'points'     => $lead->getPoints() ?? 0,
-                'lastActive' => $lead->getLastActive() ? $lead->getLastActive()->format('Y-m-d H:i:s') : null,
+                'id'         => $contact->getId(),
+                'name'       => trim(($contact->getFirstname() ?? '').' '.($contact->getLastname() ?? '')) ?: $contact->getEmail(),
+                'email'      => $contact->getEmail(),
+                'city'       => $contact->getCity(),
+                'state'      => $contact->getState(),
+                'country'    => $contact->getCountry(),
+                'stage'      => $contact->getStage() ? $contact->getStage()->getName() : null,
+                'points'     => $contact->getPoints() ?? 0,
+                'lastActive' => $contact->getLastActive() ? $contact->getLastActive()->format('Y-m-d H:i:s') : null,
             ];
         }
 
-        return ['total' => $total, 'contacts' => $contacts];
+        return ['total' => count($contacts), 'contacts' => $contacts];
     }
 
     /**
@@ -166,52 +159,27 @@ class OpportunityModel extends FormModel
     }
 
     /**
-     * @param int[] $contactIds
+     * Update opportunity contact (since opportunities now have a single contact_id field).
+     *
+     * @param int $contactId
      */
-    public function attachContacts(Opportunity $opportunity, array $contactIds): void
+    public function attachContact(Opportunity $opportunity, int $contactId): void
     {
-        $repo = $this->em->getRepository(OpportunityContact::class);
-
-        $existing = $repo->getAttachedContactIds($opportunity);
-        $toAttach = array_diff($contactIds, $existing);
-
-        if (empty($toAttach)) {
-            return;
-        }
-
         $leadRepo = $this->em->getRepository(Lead::class);
-        foreach ($toAttach as $id) {
-            /** @var Lead|null $lead */
-            $lead = $leadRepo->find($id);
-            if (null === $lead) {
-                continue;
-            }
-
-            $link = new OpportunityContact();
-            $link->setOpportunity($opportunity);
-            $link->setContact($lead);
-            $link->setDateAdded(new \DateTimeImmutable());
-            $this->em->persist($link);
-        }
-
-        $this->em->flush();
-    }
-
-    public function detachContact(Opportunity $opportunity, int $contactId): void
-    {
-        $repo = $this->em->getRepository(OpportunityContact::class);
-        $qb   = $repo->createQueryBuilder('oc');
-        $qb->where('oc.opportunity = :opportunity')
-            ->andWhere('oc.contact = :contact')
-            ->setParameters([
-                'opportunity' => $opportunity,
-                'contact'     => $contactId,
-            ]);
-
-        $link = $qb->getQuery()->getOneOrNullResult();
-        if (null !== $link) {
-            $this->em->remove($link);
+        /** @var Lead|null $lead */
+        $lead = $leadRepo->find($contactId);
+        
+        if (null !== $lead) {
+            $opportunity->setContact($lead);
+            $this->em->persist($opportunity);
             $this->em->flush();
         }
+    }
+
+    public function detachContact(Opportunity $opportunity): void
+    {
+        $opportunity->setContact(null);
+        $this->em->persist($opportunity);
+        $this->em->flush();
     }
 }

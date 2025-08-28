@@ -1,0 +1,187 @@
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}opportunity{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.opportunities.header.index'|trans }}{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'page_actions': {
+                    'templateButtons': {
+                        'new': permissions['opportunities:opportunities:create']
+                    },
+                    'routeBase': 'opportunity',
+                    'langVar': 'opportunities'
+                },
+                'bulk_actions': {
+                    'langVar': 'opportunities',
+                    'routeBase': 'opportunity',
+                    'templateButtons': {
+                        'delete': permissions['opportunities:opportunities:delete']
+                    }
+                }
+            }) }}
+            <div class="page-list">
+                {{ block('mainContent') }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
+
+{% block mainContent %}
+    {% if items is defined and items is not empty %}
+        <div class="table-responsive">
+            <table class="table table-hover" id="opportunityTable">
+                <thead>
+                    <tr>
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'checkall': 'true',
+                            'target': '#opportunityTable'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.id',
+                            'text': 'mautic.core.id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.name',
+                            'text': 'mautic.opportunities.name',
+                            'default': true
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'text': 'mautic.opportunities.contact',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'text': 'mautic.opportunities.event',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.stage',
+                            'text': 'mautic.opportunities.stage',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.amount',
+                            'text': 'mautic.opportunities.amount',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.abstractReviewResultUrl',
+                            'text': 'mautic.opportunities.abstract_review_result_url',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.invoiceUrl',
+                            'text': 'mautic.opportunities.invoice_url',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.invitationUrl',
+                            'text': 'mautic.opportunities.invitation_url',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.suitecrmId',
+                            'text': 'mautic.opportunities.suitecrm_id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'opportunity',
+                            'orderBy': 'o.opportunityExternalId',
+                            'text': 'mautic.opportunities.opportunity_external_id',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>
+                                {% set custom = [{
+                                    attr: {
+                                        href: path('mautic_opportunity_action', {objectAction: 'view', objectId: item.getId()}),
+                                        'data-toggle': 'ajax'
+                                    },
+                                    btnText: 'mautic.core.details',
+                                    iconClass: 'ri-information-line'
+                                }] %}
+                                {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                    item: item,
+                                    templateButtons: {
+                                        edit: permissions['opportunities:opportunities:edit'],
+                                        delete: permissions['opportunities:opportunities:delete']
+                                    },
+                                    routeBase: 'opportunity',
+                                    langVar: 'opportunities',
+                                    customButtons: custom
+                                }) }}
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getId() }}</td>   
+                            <td>
+                                <a href="{{ path('mautic_opportunity_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getContact() %}
+                                    {{ item.getContact().getPrimaryIdentifier() }}
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getEvent() %}
+                                    {{ item.getEvent().getName() }}
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getStage() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getAmount() }}</td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getAbstractReviewResultUrl() %}
+                                    <a href="{{ item.getAbstractReviewResultUrl() }}" target="_blank">{{ item.getAbstractReviewResultUrl() }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getInvoiceUrl() %}
+                                    <a href="{{ item.getInvoiceUrl() }}" target="_blank">{{ item.getInvoiceUrl() }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getInvitationUrl() %}
+                                    <a href="{{ item.getInvitationUrl() }}" target="_blank">{{ item.getInvitationUrl() }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
+                            <td class="visible-md visible-lg">{{ item.getOpportunityExternalId() }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'baseUrl': path('mautic_opportunity_index'),
+                    'sessionVar': 'opportunity'
+                }) }}
+            </div>
+        </div>
+    {% else %}
+        {{ include('@MauticCore/Helper/noresults.html.twig') }}
+    {% endif %}
+{% endblock %}

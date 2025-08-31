@@ -12,8 +12,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Connection $connection)
+    private ?Connection $connection = null;
+
+    public function __construct(?Connection $connection = null)
     {
+        $this->connection = $connection;
+    }
+
+    private function getConnection(): ?Connection
+    {
+        return $this->connection;
     }
     public static function getSubscribedEvents(): array
     {
@@ -37,68 +45,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             ]
         );
 
-        // Add Postmark conditions
-        $event->addCondition(
-            'postmark.delivered',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.delivered',
-                'description' => 'mautic.postmark.campaign.condition.delivered_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-            ]
-        );
-
-        $event->addCondition(
-            'postmark.opened',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.opened',
-                'description' => 'mautic.postmark.campaign.condition.opened_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-            ]
-        );
-
-        $event->addCondition(
-            'postmark.clicked',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.clicked',
-                'description' => 'mautic.postmark.campaign.condition.clicked_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-            ]
-        );
-
-        $event->addCondition(
-            'postmark.bounced',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.bounced',
-                'description' => 'mautic.postmark.campaign.condition.bounced_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-            ]
-        );
-
-        $event->addCondition(
-            'postmark.spam_complaint',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.spam_complaint',
-                'description' => 'mautic.postmark.campaign.condition.spam_complaint_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-            ]
-        );
-
-        $event->addCondition(
-            'postmark.delivery_status',
-            [
-                'label'       => 'mautic.postmark.campaign.condition.delivery_status',
-                'description' => 'mautic.postmark.campaign.condition.delivery_status_descr',
-                'callback'    => [$this, 'onCampaignTriggerCondition'],
-                'formType'    => \Mautic\CoreBundle\Form\Type\TextType::class,
-                'formTypeOptions' => [
-                    'label' => 'mautic.postmark.campaign.condition.delivery_status.value',
-                    'attr'  => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.postmark.campaign.condition.delivery_status.tooltip',
-                    ],
-                ],
-            ]
-        );
     }
 
     public function onCampaignTriggerPostmark(PendingEvent $event): void
@@ -204,11 +150,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 if ($messageId) {
                     $update['postmark_message_id'] = $messageId;
                 }
-                $this->connection->update(
-                    MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
-                    $update,
-                    ['id' => $log->getId()]
-                );
+                if ($connection = $this->getConnection()) {
+                    $connection->update(
+                        MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                        $update,
+                        ['id' => $log->getId()]
+                    );
+                }
             } catch (\Throwable) {
                 // Ignore if columns not present yet
             }
@@ -217,111 +165,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * Handle Postmark campaign conditions
-     */
-    public function onCampaignTriggerCondition(\Mautic\CampaignBundle\Event\ConditionEvent $event): void
-    {
-        $log = $event->getLog();
-        $lead = $log->getLead();
-        $eventConfig = $event->getEventConfig();
-        $config = $eventConfig->getConfig();
-        $eventType = $eventConfig->getType();
-        
-        $leadId = $lead->getId();
-        $currentCampaignId = $log->getCampaign()->getId();
-        $currentEventId = $log->getEvent()->getId();
-
-        // Find the previous Postmark action in the same campaign flow
-        $previousPostmarkEvent = $this->findPreviousPostmarkEventInFlow($currentCampaignId, $currentEventId, $leadId);
-
-        if (!$previousPostmarkEvent) {
-            $event->fail();
-            return;
-        }
-
-        $conditionMet = false;
-
-        switch ($eventType) {
-            case 'postmark.delivered':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_delivered'];
-                break;
-
-            case 'postmark.opened':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_opened'];
-                break;
-
-            case 'postmark.clicked':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_clicked'];
-                break;
-
-            case 'postmark.bounced':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_bounced'];
-                break;
-
-            case 'postmark.spam_complaint':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_spam_complaint'];
-                break;
-
-            case 'postmark.delivery_status':
-                $expectedStatus = $config['delivery_status'] ?? '';
-                $actualStatus = $previousPostmarkEvent['postmark_delivery_status'] ?? '';
-                $conditionMet = ($actualStatus === $expectedStatus);
-                break;
-        }
-
-        if ($conditionMet) {
-            $event->pass();
-        } else {
-            $event->fail();
-        }
-    }
-
-    /**
-     * Find the previous Postmark action event in the same campaign flow for this contact
-     */
-    private function findPreviousPostmarkEventInFlow(int $campaignId, int $currentEventId, int $leadId): ?array
-    {
-        // First, get the campaign structure to understand the flow order
-        $campaignEventsQb = $this->connection->createQueryBuilder();
-        $campaignEventsQb->select('id', 'type', 'event_order')
-                        ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
-                        ->where('ce.campaign_id = :campaignId')
-                        ->andWhere('ce.channel = :channel')
-                        ->andWhere('ce.type = :actionType')
-                        ->andWhere('ce.event_order < (SELECT event_order FROM '.MAUTIC_TABLE_PREFIX.'campaign_events WHERE id = :currentEventId)')
-                        ->setParameter('campaignId', $campaignId)
-                        ->setParameter('channel', 'postmark')
-                        ->setParameter('actionType', 'action')
-                        ->setParameter('currentEventId', $currentEventId)
-                        ->orderBy('ce.event_order', 'DESC')
-                        ->setMaxResults(1);
-
-        $previousEvent = $campaignEventsQb->executeQuery()->fetchAssociative();
-
-        if (!$previousEvent) {
-            return null;
-        }
-
-        // Now find the log entry for this contact and this previous event
-        $logQb = $this->connection->createQueryBuilder();
-        $logQb->select('*')
-             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
-             ->where('log.lead_id = :leadId')
-             ->andWhere('log.campaign_id = :campaignId')
-             ->andWhere('log.event_id = :eventId')
-             ->andWhere('log.channel = :channel')
-             ->setParameter('leadId', $leadId)
-             ->setParameter('campaignId', $campaignId)
-             ->setParameter('eventId', $previousEvent['id'])
-             ->setParameter('channel', 'postmark')
-             ->orderBy('log.date_triggered', 'DESC')
-             ->setMaxResults(1);
-
-        $result = $logQb->executeQuery()->fetchAssociative();
-        
-        return $result ?: null;
-    }
 
     /**
      * Very basic token replacement supporting patterns like {contactfield=email}, {contactfield=firstname}, etc.

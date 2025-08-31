@@ -120,6 +120,8 @@
 !/plugins/MauticTagManagerBundle
 !/plugins/MauticEventsBundle
 !/plugins/MauticOpportunitiesBundle
+!/plugins/MauticPostmarkBundle
+!/plugins/MauticWithPostmarkBundle
 !/plugins/index.html
 !/plugins/.gitkeep
 

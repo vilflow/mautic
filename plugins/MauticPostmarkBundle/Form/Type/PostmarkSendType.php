@@ -3,35 +3,81 @@
 namespace MauticPlugin\MauticPostmarkBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use MauticPlugin\MauticPostmarkBundle\Service\PostmarkApiService;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class PostmarkSendType extends AbstractType
 {
+    private PostmarkApiService $postmarkApiService;
+    private ParameterBagInterface $parameterBag;
+
+    public function __construct(PostmarkApiService $postmarkApiService, ParameterBagInterface $parameterBag)
+    {
+        $this->postmarkApiService = $postmarkApiService;
+        $this->parameterBag = $parameterBag;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Get account token from environment
+        $envAccountToken = $this->getAccountTokenFromEnv();
+        
         // Authentication & Configuration Section
         $builder
-            ->add('server_token', PasswordType::class, [
-                'label'       => 'mautic.postmark.form.server_token',
-                'required'    => true,
-                'constraints' => [
-                    new NotBlank(['message' => 'mautic.postmark.form.server_token.required']),
-                ],
+            ->add('account_token', PasswordType::class, [
+                'label'       => 'mautic.postmark.form.account_token',
+                'required'    => false,
+                'data'        => $envAccountToken,
                 'attr'        => [
                     'class'           => 'form-control',
                     'autocomplete'    => 'new-password',
                     'data-toggle'     => 'tooltip',
                     'data-placement'  => 'top',
-                    'title'           => 'mautic.postmark.form.server_token.tooltip',
-                    // 'style'           => 'background-color: #f8f9fa; border: 2px solid #dee2e6;',
+                    'title'           => 'mautic.postmark.form.account_token.tooltip',
+                    'readonly'        => !empty($envAccountToken),
                 ],
+            ]);
+
+        // Pre-populate server choices if account token is available
+        $serverChoices = [];
+        if (!empty($envAccountToken)) {
+            try {
+                [$success, $servers] = $this->postmarkApiService->getServerList($envAccountToken);
+                if ($success && !empty($servers)) {
+                    $serverChoices = $this->postmarkApiService->formatServerChoices($servers);
+                }
+            } catch (\Exception $e) {
+                // Log the error or handle it gracefully
+                // For now, just continue with empty choices
+            }
+        }
+
+        $builder
+            ->add('server_token', ChoiceType::class, [
+                'label'       => 'mautic.postmark.form.server_token',
+                'required'    => true,
+                'choices'     => $serverChoices,
+                'constraints' => [
+                    new NotBlank(['message' => 'mautic.postmark.form.server_token.required']),
+                ],
+                'attr'        => [
+                    'class'           => 'form-control',
+                    'data-toggle'     => 'tooltip',
+                    'data-placement'  => 'top',
+                    'title'           => 'mautic.postmark.form.server_token.tooltip',
+                ],
+                'placeholder' => empty($serverChoices) ? 'mautic.postmark.form.server_token.no_servers' : 'mautic.postmark.form.server_token.placeholder',
             ]);
 
         // Email Configuration Section  
@@ -100,6 +146,96 @@ class PostmarkSendType extends AbstractType
                 // Set to true to persist as a flat key=>value array instead of [list => [...]]
                 // 'key_value_pairs' => true,
             ]);
+
+        // Add form event to populate server choices dynamically
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+    }
+
+    private function getAccountTokenFromEnv(): string
+    {
+        // Try multiple environment variable names
+        $envVars = [
+            'POSTMARK_ACCOUNT_TOKEN',
+            'POSTMARK_ACCOUNT_API_TOKEN', 
+            'MAUTIC_POSTMARK_ACCOUNT_TOKEN'
+        ];
+
+        foreach ($envVars as $envVar) {
+            try {
+                // First try to get from environment directly
+                $token = $_ENV[$envVar] ?? $_SERVER[$envVar] ?? '';
+                if (!empty($token)) {
+                    return $token;
+                }
+                
+                // Then try parameter bag if the env() processor is configured
+                if ($this->parameterBag->has('env(' . $envVar . ')')) {
+                    $token = $this->parameterBag->get('env(' . $envVar . ')');
+                    if (!empty($token) && $token !== $envVar) {
+                        return $token;
+                    }
+                }
+            } catch (\Exception $e) {
+                // Skip this environment variable and try the next one
+                continue;
+            }
+        }
+
+        return '';
+    }
+
+    public function onPreSetData(FormEvent $event): void
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        $accountToken = $data['account_token'] ?? '';
+        if (!empty($accountToken)) {
+            $this->updateServerChoices($form, $accountToken);
+        }
+    }
+
+    public function onPreSubmit(FormEvent $event): void
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        $accountToken = $data['account_token'] ?? '';
+        if (!empty($accountToken)) {
+            $this->updateServerChoices($form, $accountToken);
+        }
+    }
+
+    private function updateServerChoices($form, string $accountToken): void
+    {
+        $choices = [];
+        
+        try {
+            [$success, $servers] = $this->postmarkApiService->getServerList($accountToken);
+            if ($success && !empty($servers)) {
+                $choices = $this->postmarkApiService->formatServerChoices($servers);
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle it gracefully
+            // For now, just continue with empty choices
+        }
+
+        $form->add('server_token', ChoiceType::class, [
+            'label'       => 'mautic.postmark.form.server_token',
+            'required'    => true,
+            'choices'     => $choices,
+            'constraints' => [
+                new NotBlank(['message' => 'mautic.postmark.form.server_token.required']),
+            ],
+            'attr'        => [
+                'class'           => 'form-control',
+                'data-toggle'     => 'tooltip',
+                'data-placement'  => 'top',
+                'title'           => 'mautic.postmark.form.server_token.tooltip',
+            ],
+            'placeholder' => empty($choices) ? 'mautic.postmark.form.server_token.no_servers' : 'mautic.postmark.form.server_token.placeholder',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

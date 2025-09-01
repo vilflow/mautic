@@ -126,6 +126,7 @@ class PostmarkSendType extends AbstractType
                     'data-toggle'     => 'tooltip',
                     'data-placement'  => 'top',
                     'title'           => 'mautic.postmark.form.template_alias.tooltip',
+                    'onchange'        => 'Mautic.postmarkLoadTemplateVariables(this)',
                 ],
                 'placeholder' => 'mautic.postmark.form.template_alias.placeholder',
             ])
@@ -267,6 +268,7 @@ class PostmarkSendType extends AbstractType
                 'data-toggle'     => 'tooltip',
                 'data-placement'  => 'top',
                 'title'           => 'mautic.postmark.form.template_alias.tooltip',
+                'onchange'        => 'Mautic.postmarkLoadTemplateVariables(this)',
             ],
             'placeholder' => empty($choices) ? 'mautic.postmark.form.template_alias.no_templates' : 'mautic.postmark.form.template_alias.placeholder',
         ]);

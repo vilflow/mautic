@@ -72,10 +72,11 @@ class PostmarkSendType extends AbstractType
                     new NotBlank(['message' => 'mautic.postmark.form.server_token.required']),
                 ],
                 'attr'        => [
-                    'class'           => 'form-control',
+                    'class'           => 'form-control postmark-server-select',
                     'data-toggle'     => 'tooltip',
                     'data-placement'  => 'top',
                     'title'           => 'mautic.postmark.form.server_token.tooltip',
+                    'onchange'        => 'Mautic.postmarkLoadTemplates(this)',
                 ],
                 'placeholder' => empty($serverChoices) ? 'mautic.postmark.form.server_token.no_servers' : 'mautic.postmark.form.server_token.placeholder',
             ]);
@@ -113,19 +114,20 @@ class PostmarkSendType extends AbstractType
 
         // Postmark Template Section
         $builder
-            ->add('template_alias', TextType::class, [
+            ->add('template_alias', ChoiceType::class, [
                 'label'       => 'mautic.postmark.form.template_alias',
                 'required'    => true,
+                'choices'     => [],
                 'constraints' => [
                     new NotBlank(['message' => 'mautic.postmark.form.template_alias.required']),
                 ],
                 'attr'        => [
-                    'class'           => 'form-control',
-                    'placeholder'     => 'welcome-email',
+                    'class'           => 'form-control postmark-template-select',
                     'data-toggle'     => 'tooltip',
                     'data-placement'  => 'top',
                     'title'           => 'mautic.postmark.form.template_alias.tooltip',
                 ],
+                'placeholder' => 'mautic.postmark.form.template_alias.placeholder',
             ])
             ->add('template_model', SortableListType::class, [
                 'label'           => 'mautic.postmark.form.template_model',
@@ -229,12 +231,44 @@ class PostmarkSendType extends AbstractType
                 new NotBlank(['message' => 'mautic.postmark.form.server_token.required']),
             ],
             'attr'        => [
-                'class'           => 'form-control',
+                'class'           => 'form-control postmark-server-select',
                 'data-toggle'     => 'tooltip',
                 'data-placement'  => 'top',
                 'title'           => 'mautic.postmark.form.server_token.tooltip',
+                'onchange'        => 'Mautic.postmarkLoadTemplates(this)',
             ],
             'placeholder' => empty($choices) ? 'mautic.postmark.form.server_token.no_servers' : 'mautic.postmark.form.server_token.placeholder',
+        ]);
+    }
+
+    private function updateTemplateChoices($form, string $serverToken): void
+    {
+        $choices = [];
+        
+        try {
+            [$success, $templates] = $this->postmarkApiService->getTemplateList($serverToken);
+            if ($success && !empty($templates)) {
+                $choices = $this->postmarkApiService->formatTemplateChoices($templates);
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle it gracefully
+            // For now, just continue with empty choices
+        }
+
+        $form->add('template_alias', ChoiceType::class, [
+            'label'       => 'mautic.postmark.form.template_alias',
+            'required'    => true,
+            'choices'     => $choices,
+            'constraints' => [
+                new NotBlank(['message' => 'mautic.postmark.form.template_alias.required']),
+            ],
+            'attr'        => [
+                'class'           => 'form-control postmark-template-select',
+                'data-toggle'     => 'tooltip',
+                'data-placement'  => 'top',
+                'title'           => 'mautic.postmark.form.template_alias.tooltip',
+            ],
+            'placeholder' => empty($choices) ? 'mautic.postmark.form.template_alias.no_templates' : 'mautic.postmark.form.template_alias.placeholder',
         ]);
     }
 

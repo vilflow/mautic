@@ -13,5 +13,17 @@ return [
                 'method'     => 'POST',
             ],
         ],
+        'main' => [
+            'mautic_postmark_ajax' => [
+                'path'       => '/postmark/ajax/{objectAction}',
+                'controller' => 'MauticPlugin\\MauticPostmarkBundle\\Controller\\AjaxController::executeAjaxAction',
+                'method'     => 'POST',
+            ],
+        ],
+    ],
+    'assets'      => [
+        'js' => [
+            'plugins/MauticPostmarkBundle/Assets/js/postmark.js',
+        ],
     ],
 ];

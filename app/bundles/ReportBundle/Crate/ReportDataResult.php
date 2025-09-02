@@ -174,6 +174,10 @@ class ReportDataResult
     private function buildHeader($data): void
     {
         foreach ($this->columnKeys as $k) {
+            if (!isset($data['dataColumns'][$k])) {
+                continue;
+            }
+            
             $dataColumn      = $data['dataColumns'][$k];
             $label           = $data['columns'][$dataColumn]['label'];
 
@@ -195,6 +199,9 @@ class ReportDataResult
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
                 $this->types[$k] = (str_starts_with($k, 'AVG')) ? 'float' : 'int';
             } else {
+                if (!isset($data['dataColumns'][$k])) {
+                    continue;
+                }
                 $dataColumn      = $data['dataColumns'][$k];
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];
             }

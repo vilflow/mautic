@@ -92,12 +92,25 @@ class PostmarkConditionSubscriber implements EventSubscriberInterface
     public function onCampaignCondition(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
+        if (!$eventDetails) {
+            return $event->setResult(false);
+        }
+        
         $eventType = $eventDetails->getType();
         $config = $event->getConfig();
         $lead = $event->getLead();
         
+        if (!$lead) {
+            return $event->setResult(false);
+        }
+        
         $leadId = $lead->getId();
-        $currentCampaignId = $eventDetails->getCampaign()->getId();
+        $campaign = $eventDetails->getCampaign();
+        if (!$campaign) {
+            return $event->setResult(false);
+        }
+        
+        $currentCampaignId = $campaign->getId();
         $currentEventId = $eventDetails->getId();
 
         // Find the previous Postmark action in the same campaign flow
@@ -111,23 +124,23 @@ class PostmarkConditionSubscriber implements EventSubscriberInterface
 
         switch ($eventType) {
             case 'postmark.delivered':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_delivered'];
+                $conditionMet = (bool) ($previousPostmarkEvent['postmark_delivered'] ?? 0);
                 break;
 
             case 'postmark.opened':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_opened'];
+                $conditionMet = (bool) ($previousPostmarkEvent['postmark_opened'] ?? 0);
                 break;
 
             case 'postmark.clicked':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_clicked'];
+                $conditionMet = (bool) ($previousPostmarkEvent['postmark_clicked'] ?? 0);
                 break;
 
             case 'postmark.bounced':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_bounced'];
+                $conditionMet = (bool) ($previousPostmarkEvent['postmark_bounced'] ?? 0);
                 break;
 
             case 'postmark.spam_complaint':
-                $conditionMet = (bool) $previousPostmarkEvent['postmark_spam_complaint'];
+                $conditionMet = (bool) ($previousPostmarkEvent['postmark_spam_complaint'] ?? 0);
                 break;
 
             case 'postmark.delivery_status':
@@ -136,7 +149,7 @@ class PostmarkConditionSubscriber implements EventSubscriberInterface
                 $conditionMet = ($actualStatus === $expectedStatus);
                 break;
         }
-
+        
         return $event->setResult($conditionMet);
     }
 
@@ -145,44 +158,25 @@ class PostmarkConditionSubscriber implements EventSubscriberInterface
      */
     private function findPreviousPostmarkEventInFlow(int $campaignId, int $currentEventId, int $leadId): ?array
     {
-        // First, get the campaign structure to understand the flow order
-        $campaignEventsQb = $this->connection->createQueryBuilder();
-        $campaignEventsQb->select('id', 'type', 'event_order')
-                        ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
-                        ->where('ce.campaign_id = :campaignId')
-                        ->andWhere('ce.channel = :channel')
-                        ->andWhere('ce.type = :actionType')
-                        ->andWhere('ce.event_order < (SELECT event_order FROM '.MAUTIC_TABLE_PREFIX.'campaign_events WHERE id = :currentEventId)')
-                        ->setParameter('campaignId', $campaignId)
-                        ->setParameter('channel', 'postmark')
-                        ->setParameter('actionType', 'action')
-                        ->setParameter('currentEventId', $currentEventId)
-                        ->orderBy('ce.event_order', 'DESC')
-                        ->setMaxResults(1);
-
-        $previousEvent = $campaignEventsQb->executeQuery()->fetchAssociative();
-
-        if (!$previousEvent) {
-            return null;
+        // Try to find ANY postmark event logs for this campaign and lead first
+        $allPostmarkLogs = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where('log.lead_id = :leadId')
+            ->andWhere('log.campaign_id = :campaignId')
+            ->andWhere('log.channel = :channel')
+            ->setParameter('leadId', $leadId)
+            ->setParameter('campaignId', $campaignId)
+            ->setParameter('channel', 'postmark')
+            ->orderBy('log.date_triggered', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+            
+        if (!empty($allPostmarkLogs)) {
+            // Return the most recent postmark event log
+            return $allPostmarkLogs[0];
         }
 
-        // Now find the log entry for this contact and this previous event
-        $logQb = $this->connection->createQueryBuilder();
-        $logQb->select('*')
-             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
-             ->where('log.lead_id = :leadId')
-             ->andWhere('log.campaign_id = :campaignId')
-             ->andWhere('log.event_id = :eventId')
-             ->andWhere('log.channel = :channel')
-             ->setParameter('leadId', $leadId)
-             ->setParameter('campaignId', $campaignId)
-             ->setParameter('eventId', $previousEvent['id'])
-             ->setParameter('channel', 'postmark')
-             ->orderBy('log.date_triggered', 'DESC')
-             ->setMaxResults(1);
-
-        $result = $logQb->executeQuery()->fetchAssociative();
-        
-        return $result ?: null;
+        return null;
     }
 }

@@ -34,20 +34,20 @@ class PostmarkSendType extends AbstractType
         $envAccountToken = $this->getAccountTokenFromEnv();
         
         // Authentication & Configuration Section
-        $builder
-            ->add('account_token', PasswordType::class, [
-                'label'       => 'mautic.postmark.form.account_token',
-                'required'    => false,
-                'data'        => $envAccountToken,
-                'attr'        => [
-                    'class'           => 'form-control',
-                    'autocomplete'    => 'new-password',
-                    'data-toggle'     => 'tooltip',
-                    'data-placement'  => 'top',
-                    'title'           => 'mautic.postmark.form.account_token.tooltip',
-                    'readonly'        => !empty($envAccountToken),
-                ],
-            ]);
+        // $builder
+        //     ->add('account_token', PasswordType::class, [
+        //         'label'       => 'mautic.postmark.form.account_token',
+        //         'required'    => false,
+        //         'data'        => $envAccountToken,
+        //         'attr'        => [
+        //             'class'           => 'form-control',
+        //             'autocomplete'    => 'new-password',
+        //             'data-toggle'     => 'tooltip',
+        //             'data-placement'  => 'top',
+        //             'title'           => 'mautic.postmark.form.account_token.tooltip',
+        //             'readonly'        => !empty($envAccountToken),
+        //         ],
+        //     ]);
 
         // Pre-populate server choices if account token is available
         $serverChoices = [];
@@ -197,6 +197,11 @@ class PostmarkSendType extends AbstractType
         if (!empty($accountToken)) {
             $this->updateServerChoices($form, $accountToken);
         }
+        
+        $serverToken = $data['server_token'] ?? '';
+        if (!empty($serverToken)) {
+            $this->updateTemplateChoices($form, $serverToken);
+        }
     }
 
     public function onPreSubmit(FormEvent $event): void
@@ -207,6 +212,11 @@ class PostmarkSendType extends AbstractType
         $accountToken = $data['account_token'] ?? '';
         if (!empty($accountToken)) {
             $this->updateServerChoices($form, $accountToken);
+        }
+        
+        $serverToken = $data['server_token'] ?? '';
+        if (!empty($serverToken)) {
+            $this->updateTemplateChoices($form, $serverToken);
         }
     }
 
@@ -278,6 +288,7 @@ class PostmarkSendType extends AbstractType
     {
         $resolver->setDefaults([
             'required' => false,
+            'translation_domain' => 'messages',
         ]);
     }
 

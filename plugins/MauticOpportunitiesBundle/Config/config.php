@@ -37,6 +37,14 @@ return [
                 'method'     => 'DELETE',
             ],
         ],
+        'api' => [
+            'mautic_api_opportunitiesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'opportunities',
+                'path'            => '/opportunities',
+                'controller'      => MauticPlugin\MauticOpportunitiesBundle\Controller\Api\OpportunityApiController::class,
+            ],
+        ],
     ],
 
     'menu' => [

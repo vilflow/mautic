@@ -15,6 +15,7 @@
     <div class="box-layout">
         <div class="col-md-12 height-auto">
             <div class="pa-md">
+                {# Required fields section #}
                 <div class="row">
                     <div class="col-md-6">
                         {{ form_row(form.opportunityExternalId) }}
@@ -31,20 +32,98 @@
                         {{ form_row(form.event) }}
                     </div>
                 </div>
+
+                {# Basic information section #}
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form_row(form.stage) }}
+                        {{ form_row(form.opportunityType) }}
                     </div>
                     <div class="col-md-6">
+                        {{ form_row(form.leadSource) }}
+                    </div>
+                </div>
+
+                {# Financial information section #}
+                <div class="row">
+                    <div class="col-md-6">
                         {{ form_row(form.amount) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.amountUsdollar) }}
+                    </div>
+                </div>
+
+                {# Sales information section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.salesStage) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractBookInformationC) }}
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.probability) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.dateClosed) }}
+                    </div>
+                </div>
+                {# Academic/Conference section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.institutionC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.paperTitleC) }}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form_row(form.abstractReviewResultUrl) }}
+                        {{ form_row(form.coAuthorsNamesC) }}
                     </div>
                     <div class="col-md-6">
-                        {{ form_row(form.invoiceUrl) }}
+                        {{ form_row(form.presentationTypeC) }}
+                    </div>
+                </div>
+
+                {# Registration and Payment section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.registrationTypeC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.paymentStatusC) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.paymentChannelC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.couponCodeC) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.transactionIdC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.reviewResultC) }}
+                    </div>
+                </div>
+
+                {# URLs and Attachments section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractReviewResultUrlC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.invoiceUrlC) }}
                     </div>
                 </div>
                 <div class="row">
@@ -52,9 +131,105 @@
                         {{ form_row(form.invitationUrl) }}
                     </div>
                     <div class="col-md-6">
-                        {{ form_row(form.suitecrmId) }}
+                        {{ form_row(form.invitationLetterUrlC) }}
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.salesReceiptUrlC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractAttachmentC) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.acceptanceLetterUrlC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.wireTransferAttachmentC) }}
+                    </div>
+                </div>
+
+                {# Important Dates section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractBookSendDateC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractResultSendDateC) }}
+                    </div>
+                </div>
+
+                {# Geographic information section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.jjwgMapsAddressC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.jjwgMapsGeocodeStatusC) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.jjwgMapsLatC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.jjwgMapsLngC) }}
+                    </div>
+                </div>
+
+                {# System fields section #}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.suitecrmId) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractResultReadyDateC) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.extraPaperC) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.nextStep) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.description) }}
+                    </div>
+   
+                    <div class="col-md-6">
+                        {{ form_row(form.abstractC) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                     <div class="col-md-6">
+                        {{ form_row(form.keywordsC) }}
+                    </div>
+                </div>
+
+                {# Boolean options section #}
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ form_row(form.abstractBookDpublicationC) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(form.smsPermissionC) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(form.withdrawC) }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_row(form.deleted) }}
+                    </div>
+                </div>
+                
+
             </div>
         </div>
     </div>

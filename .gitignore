@@ -120,6 +120,8 @@
 !/plugins/MauticTagManagerBundle
 !/plugins/MauticEventsBundle
 !/plugins/MauticOpportunitiesBundle
+!/plugins/MauticPostmarkBundle
+!/plugins/MauticWithPostmarkBundle
 !/plugins/index.html
 !/plugins/.gitkeep
 
@@ -145,3 +147,5 @@ tests/**/*.sql
 !/themes/blank-big.png
 
 /translations
+
+!.env.example

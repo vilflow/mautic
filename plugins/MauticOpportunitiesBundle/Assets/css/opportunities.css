@@ -1,0 +1,169 @@
+/* Opportunity Details Page Styles */
+.detail-item {
+    margin-bottom: 15px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.detail-value {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.detail-value strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.detail-value code {
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #e83e8c;
+}
+
+/* Location and Links sections */
+.location-info, .links-info {
+    text-align: center;
+    padding: 15px;
+}
+
+.location-info .fa-globe,
+.links-info .fa-external-link {
+    color: #17a2b8;
+    margin-bottom: 15px;
+}
+
+/* Stats section */
+.stat-box {
+    padding: 20px 15px;
+}
+
+.stat-icon {
+    margin-bottom: 10px;
+}
+
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #007bff;
+    margin: 5px 0;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Panel improvements */
+.panel.panel-primary .panel-heading {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-color: #007bff;
+}
+
+.panel.panel-info .panel-heading {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    border-color: #17a2b8;
+}
+
+.panel.panel-success .panel-heading {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border-color: #28a745;
+}
+
+.panel-title i {
+    opacity: 0.9;
+}
+
+/* Button enhancements */
+.btn-block + .btn-block {
+    margin-top: 0;
+}
+
+.btn {
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive improvements */
+@media (max-width: 767px) {
+    .detail-value {
+        margin-bottom: 15px;
+    }
+    
+    .location-info, .links-info {
+        margin-bottom: 20px;
+    }
+    
+    .stat-box {
+        padding: 15px 10px;
+    }
+}
+
+/* Contact search improvements */
+#contact-search {
+    min-height: 100px;
+}
+
+/* Make contact search select height match attach button */
+#contact-search + .chosen-container .chosen-choices {
+    min-height: 40px !important;
+    height: 34px !important;
+    padding: 6px 12px !important;
+    border-radius: 4px !important;
+}
+
+#contact-search + .chosen-container .chosen-choices .search-field input {
+    height: 20px !important;
+    margin: 0 !important;
+    padding: 10px 0 0 10pr !important;
+}
+
+/* Table improvements */
+#opportunity-contacts-table {
+    margin-top: 20px;
+}
+
+/* Animation for loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

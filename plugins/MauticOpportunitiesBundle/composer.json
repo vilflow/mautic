@@ -1,0 +1,13 @@
+{
+    "name": "mautic/plugin-events",
+    "description": "Events Plugin",
+    "type": "mautic-plugin",
+    "keywords": ["mautic", "plugin", "events"],
+    "extra": {
+        "install-directory-name": "MauticEventsBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^6.0"
+    }
+}

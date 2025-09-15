@@ -1,0 +1,154 @@
+{#
+  Variables:
+    - contacts
+    - opportunity
+    - tmpl
+    - permissions
+    - security
+    - page
+    - limit
+    - totalItems
+#}
+{% set baseUrl = path('mautic_opportunity_contacts', {'objectId': opportunity.getId()}) %}
+{% set customButtons = [] %}
+
+{% if contacts|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover" id="opportunityContactsTable">
+            <thead>
+                <tr>
+                    <th width="1%">
+                        <label class="checkbox-inline custom-checkbox pl-10">
+                            <input type="checkbox" id="customcheckbox-one28" value="1" data-toggle="checkall" data-target="#opportunityContactsTable">
+                            <span></span>
+                        </label>
+                    </th>
+                    <th class="col-lead-name">
+                        <a href="#" data-column="name">
+                            {{ 'mautic.core.name'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="col-lead-email visible-md visible-lg">
+                        <a href="#" data-column="email">
+                            {{ 'mautic.core.type.email'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="col-lead-location visible-md visible-lg">
+                        <a href="#" data-column="location">
+                            {{ 'mautic.lead.lead.thead.location'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="col-lead-stage">
+                        <a href="#" data-column="stage">
+                            {{ 'mautic.lead.stage.label'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="visible-md visible-lg col-lead-points">
+                        <a href="#" data-column="points">
+                            {{ 'mautic.lead.points'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="col-lead-lastactive visible-md visible-lg">
+                        <a href="#" data-column="last_active">
+                            {{ 'mautic.lead.lastactive'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th class="col-lead-id visible-md visible-lg">
+                        <a href="#" data-column="id">
+                            {{ 'mautic.core.id'|trans }}
+                            <i class="fa fa-sort"></i>
+                        </a>
+                    </th>
+                    <th width="1%" class="text-center">
+                        {{ 'mautic.core.actions'|trans }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for contact in contacts %}
+                <tr>
+                    <td>
+                        <label class="checkbox-inline custom-checkbox pl-10">
+                            <input type="checkbox" name="ids[]" value="{{ contact.id }}" data-contact-id="{{ contact.id }}">
+                            <span></span>
+                        </label>
+                    </td>
+                    <td>
+                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
+                            <div>{{ contact.name ? contact.name : 'Anonymous'|trans }}</div>
+                            <div class="small">{{ contact.email }}</div>
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg">{{ contact.email }}</td>
+                    <td class="visible-md visible-lg">
+                        {% set location = [] %}
+                        {% if contact.city %}
+                            {% set location = location|merge([contact.city]) %}
+                        {% endif %}
+                        {% if contact.state %}
+                            {% set location = location|merge([contact.state]) %}
+                        {% elseif contact.country %}
+                            {% set location = location|merge([contact.country]) %}
+                        {% endif %}
+                        {{ location|join(', ') }}
+                    </td>
+                    <td class="text-center">
+                        {% if contact.stage %}
+                            <span class="label label-default">{{ contact.stage }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg text-center">
+                        <span class="label label-default">{{ contact.points|default(0) }}</span>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% if contact.lastActive %}
+                            <abbr title="{{ contact.lastActive|date('Y-m-d H:i:s') }}">
+                                {{ contact.lastActive|date('Y-m-d H:i:s') }}
+                            </abbr>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">{{ contact.id }}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-danger btn-remove-contact" 
+                                data-contact-id="{{ contact.id }}" 
+                                data-contact-name="{{ contact.name ? contact.name : contact.email }}"
+                                title="{{ 'opportunities.contact.remove'|trans }}">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if totalItems > limit %}
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="pull-left">
+                        {{ 'mautic.core.pagination.count'|trans({'%count%': contacts|length, '%total%': totalItems}) }}
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="pull-right">
+                        {{ 'pagination will be implemented here'|trans }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="panel">
+        <div class="panel-body text-center">
+            <h4>{{ 'opportunities.contact.none'|trans }}</h4>
+            <p class="text-muted">{{ 'opportunities.contact.none_description'|trans }}</p>
+        </div>
+    </div>
+{% endif %}
